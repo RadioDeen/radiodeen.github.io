@@ -430,11 +430,11 @@ const prayerTimeCalculator = {
                 isha: { start: "19:15", end: "5:05" }
                 },
 				27: {
-                fajr: { start: "5:07", end: "6:21" },
-                dhuhr: { start: "12:11", end: "16:21" },
-                asr: { start: "16:22", end: "17:55" },
-                maghrib: { start: "18:00", end: "19:14" },
-                isha: { start: "19:15", end: "5:01" }
+                fajr: { start: "5:09", end: "6:22" },
+                dhuhr: { start: "12:16", end: "16:22" },
+                asr: { start: "16:23", end: "17:59" },
+                maghrib: { start: "18:03", end: "19:14" },
+                isha: { start: "19:15", end: "5:04" }
                 },
 				28: {
                 fajr: { start: "5:06", end: "6:21" },
@@ -2727,10 +2727,24 @@ function convertToBanglaNumber(number) {
     return number.toString().split('').map(digit => banglaNumbers[digit]).join('');
 }
 
-// সময় ফরম্যাট করার ফাংশন
+// 24 ঘন্টার ফরম্যাট থেকে 12 ঘন্টার ফরম্যাটে কনভার্ট করার ফাংশন
+function convertTo12Hour(time24) {
+    const [hour, minute] = time24.split(':').map(Number);
+    let hour12 = hour;
+
+    if (hour > 12) {
+        hour12 = hour - 12;
+    }
+    if (hour === 0) {
+        hour12 = 12;
+    }
+
+    return `${hour12}:${minute.toString().padStart(2, '0')}`;
+}
+
+// সময় ফরম্যাট করার ফাংশন আপডেট
 function formatTimeToBangla(time) {
-    const [hours, minutes] = time.split(':');
-    return `${convertToBanglaNumber(hours)}:${convertToBanglaNumber(minutes)}`;
+    return convertTo12Hour(time);
 }
 
 // আজকের তারিখ অনুযায়ী সময় পাওয়া
