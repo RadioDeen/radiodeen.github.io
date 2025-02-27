@@ -3,20 +3,20 @@
 
 // সংগীতের তালিকা
 const musicPlaylist = [
-    { title: "Ami_chitkar_kore_kadite_chahiya", url: "https://tinyurl.com/mr296bjy" },
-    { title: "Dao_Khoda_dao_amay_abar", url: "https://tinyurl.com/64zvw6et" },
-    { title: "Eto_valobaso_keno_Malik", url: "https://tinyurl.com/4vn8kyyy" },
-    { title: "Hardam_Allah", url: "https://tinyurl.com/584x9xdw" },
-    { title: "He_rasul_bujhina_ami", url: "https://tinyurl.com/3fzuewbr" },
-    { title: "Hridoy_majhe_mala_gathi", url: "https://tinyurl.com/4n8vw7s4" },
-    { title: "Jodi_naat_likhte_likhte", url: "https://tinyurl.com/2drh2uwy" },
-    { title: "Koto_dur_oi_madinar_poth", url: "https://tinyurl.com/bdd3wp5b" },
-    { title: "Lukono_ful", url: "https://tinyurl.com/mrx5am9f" },
-    { title: "Main_banda_e_aasi_hoon", url: "https://tinyurl.com/bds52s2m" },
-    { title: "Mujhe_kufawalo", url: "https://tinyurl.com/2wc6tevj" },
-    { title: "Naate_sarkar_ki_parhta_hoon", url: "https://tinyurl.com/zmu4dwvj" },
-    { title: "Ogo_Rab", url: "https://tinyurl.com/3jspsdev" },
-    { title: "Woh_mera_nabi_hai", url: "https://tinyurl.com/4ttcm6d8" }
+    { title: "Ami_chitkar_kore_kadite_chahiya", url: "Islamic_Song/Ami_chitkar_kore_kadite_chahiya.mp3" },
+    { title: "Dao_Khoda_dao_amay_abar", url: "Islamic_Song/Dao_Khoda_dao_amay_abar.mp3" },
+    { title: "Eto_valobaso_keno_Malik", url: "Islamic_Song/Eto_valobaso_keno_Malik.mp3" },
+    { title: "Hardam_Allah", url: "Islamic_Song/Hardam_Allah.mp3" },
+    { title: "He_rasul_bujhina_ami", url: "Islamic_Song/He_rasul_bujhina_ami.mp3" },
+    { title: "Hridoy_majhe_mala_gathi", url: "Islamic_Song/Hridoy_majhe_mala_gathi.mp3" },
+    { title: "Jodi_naat_likhte_likhte", url: "Islamic_Song/Jodi_naat_likhte_likhte.mp3" },
+    { title: "Koto_dur_oi_madinar_poth", url: "Islamic_Song/Koto_dur_oi_madinar_poth.mp3" },
+    { title: "Lukono_ful", url: "Islamic_Song/Lukono_ful.mp3" },
+    { title: "Main_banda_e_aasi_hoon", url: "Islamic_Song/Main_banda_e_aasi_hoon.mp3" },
+    { title: "Mujhe_kufawalo", url: "Islamic_Song/Mujhe_kufawalo.mp3" },
+    { title: "Naate_sarkar_ki_parhta_hoon", url: "Islamic_Song/Naate_sarkar_ki_parhta_hoon.mp3" },
+    { title: "Ogo_Rab", url: "Islamic_Song/Ogo_Rab.mp3" },
+    { title: "Woh_mera_nabi_hai", url: "Islamic_Song/Woh_mera_nabi_hai.mp3" }
 ];
 
 // আপনি চাইলে আরও গান যোগ করতে পারেন
