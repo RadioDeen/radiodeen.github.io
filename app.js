@@ -70,6 +70,7 @@ async function playAzan(prayerName) {
         
         // আজান শেষে
         audioPlayer.onended = async () => {
+            updateStatus(""); // স্ট্যাটাস মেসেজ মুছে ফেলা
             await wait(3);
             isAzanPlaying = false;
             playRandomTrack();
@@ -77,6 +78,7 @@ async function playAzan(prayerName) {
     } catch (error) {
         console.error("আজান প্লে করতে সমস্যা:", error);
         isAzanPlaying = false;
+        updateStatus(""); // এরর হলেও স্ট্যাটাস মেসেজ মুছে ফেলা
     }
 }
 
@@ -88,7 +90,7 @@ function displayTodaySchedule() {
     scheduleDiv.innerHTML = '';
     for (const [prayer, time] of Object.entries(times)) {
         scheduleDiv.innerHTML += `
-            <p>${prayerNames[prayer]}: ${time.start} - ${time.end}</p>
+            <p>${prayerNames[prayer]}: ${convertTo12Hour(time.start)} - ${convertTo12Hour(time.end)}</p>
         `;
     }
 }
@@ -135,8 +137,8 @@ function displaySpecificDaySchedule() {
         tableHTML += `
             <tr>
                 <td>${prayerNames[prayer]}</td>
-                <td>${time.start}</td>
-                <td>${time.end}</td>
+                <td>${convertTo12Hour(time.start)}</td>
+                <td>${convertTo12Hour(time.end)}</td>
             </tr>
         `;
     }
@@ -170,11 +172,11 @@ function showMonthView() {
         tableHTML += `
             <tr>
                 <td><strong>${convertToBanglaNumber(day)}</strong></td>
-                <td>${times.fajr.start}-${times.fajr.end}</td>
-                <td>${times.dhuhr.start}-${times.dhuhr.end}</td>
-                <td>${times.asr.start}-${times.asr.end}</td>
-                <td>${times.maghrib.start}-${times.maghrib.end}</td>
-                <td>${times.isha.start}-${times.isha.end}</td>
+                <td>${convertTo12Hour(times.fajr.start)}-${convertTo12Hour(times.fajr.end)}</td>
+                <td>${convertTo12Hour(times.dhuhr.start)}-${convertTo12Hour(times.dhuhr.end)}</td>
+                <td>${convertTo12Hour(times.asr.start)}-${convertTo12Hour(times.asr.end)}</td>
+                <td>${convertTo12Hour(times.maghrib.start)}-${convertTo12Hour(times.maghrib.end)}</td>
+                <td>${convertTo12Hour(times.isha.start)}-${convertTo12Hour(times.isha.end)}</td>
             </tr>
         `;
     }
