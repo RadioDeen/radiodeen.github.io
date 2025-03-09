@@ -6,6 +6,28 @@ const statusMessage = document.getElementById('statusMessage');
 let currentTrackIndex = 0;
 let isAzanPlaying = false;
 let waitingTimeout = null;
+let wakeLock = null;
+
+// Wake Lock request function
+async function requestWakeLock() {
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+        }
+    } catch (err) {
+        console.log(`Wake Lock error: ${err.name}, ${err.message}`);
+    }
+}
+
+// Release Wake Lock
+function releaseWakeLock() {
+    if (wakeLock !== null) {
+        wakeLock.release()
+            .then(() => {
+                wakeLock = null;
+            });
+    }
+}
 
 // স্ট্যাটাস আপডেট করা
 function updateStatus(message) {
@@ -27,7 +49,9 @@ async function playRandomTrack() {
         document.getElementById('currentTrack').textContent = musicPlaylist[currentTrackIndex].title;
         try {
             await audioPlayer.play();
+            await requestWakeLock();
         } catch (error) {
+            console.error("Error playing track:", error);
         }
     }
 }
@@ -46,10 +70,13 @@ function togglePlayback() {
     const playPauseIcon = document.getElementById('playPauseIcon');
     
     if (audioPlayer.paused) {
-        audioPlayer.play();
-        playPauseIcon.className = 'fas fa-pause';
+        audioPlayer.play().then(() => {
+            requestWakeLock();
+            playPauseIcon.className = 'fas fa-pause';
+        });
     } else {
         audioPlayer.pause();
+        releaseWakeLock();
         playPauseIcon.className = 'fas fa-play';
     }
 }
@@ -67,6 +94,7 @@ async function playAzan(prayerName) {
         // আজান প্লে করা
         await audioPlayer.load();
         await audioPlayer.play();
+        await requestWakeLock();
         
         // আজান শেষে
         audioPlayer.onended = async () => {
@@ -214,6 +242,7 @@ setInterval(checkPrayerTimes, 60000);
 audioPlayer.onended = async () => {
     if (!isAzanPlaying) {
         await wait(3);
+        releaseWakeLock();
         playRandomTrack();
     }
 };
