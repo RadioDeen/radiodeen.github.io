@@ -103,6 +103,7 @@ function checkAndPlayScheduledAudio() {
 async function playScheduledAudio(audio) {
     if (!isAzanPlaying) { // আজান না বাজলে
         audioPlayer.pause();
+        isOthersPlaying = true; // Set the flag when starting scheduled audio
         audioPlayer.src = audio.url;
         document.getElementById('currentTrack').textContent = audio.title;
         
@@ -114,10 +115,12 @@ async function playScheduledAudio(audio) {
             await audioPlayer.play();
         } catch (error) {
             console.error("অডিও প্লে করতে সমস্যা:", error);
+            isOthersPlaying = false; // Reset flag if there's an error
         }
 
         // অডিও শেষে
         audioPlayer.onended = async () => {
+            isOthersPlaying = false; // Reset the flag when audio ends
             await wait(3); // ৩ সেকেন্ড অপেক্ষা
             playRandomTrack();
         };
