@@ -5,6 +5,7 @@ const audioPlayer = document.getElementById('audioPlayer');
 const statusMessage = document.getElementById('statusMessage');
 let currentTrackIndex = 0;
 let isAzanPlaying = false;
+let isOthersPlaying = false;  // Added flag for other scheduled audio
 let waitingTimeout = null;
 let wakeLock = null;
 
@@ -43,7 +44,7 @@ function wait(seconds) {
 
 // রেন্ডম গান বাজানো
 async function playRandomTrack() {
-    if (!isAzanPlaying) {
+    if (!isAzanPlaying && !isOthersPlaying) {
         currentTrackIndex = Math.floor(Math.random() * musicPlaylist.length);
         audioPlayer.src = musicPlaylist[currentTrackIndex].url;
         document.getElementById('currentTrack').textContent = musicPlaylist[currentTrackIndex].title;
@@ -58,7 +59,7 @@ async function playRandomTrack() {
 
 // পরবর্তী গানে যাওয়া
 async function skipTrack() {
-    if (!isAzanPlaying) {
+    if (!isAzanPlaying && !isOthersPlaying) {
         audioPlayer.pause();
         await wait(3);
         playRandomTrack();
@@ -85,6 +86,7 @@ function togglePlayback() {
 async function playAzan(prayerName) {
     try {
         isAzanPlaying = true;
+        isOthersPlaying = true;  // Set flag for other scheduled audio
         audioPlayer.pause();
         
         // আজানের অডিও লোড করা
@@ -101,11 +103,13 @@ async function playAzan(prayerName) {
             updateStatus(""); // স্ট্যাটাস মেসেজ মুছে ফেলা
             await wait(3);
             isAzanPlaying = false;
+            isOthersPlaying = false;  // Reset flag for other scheduled audio
             playRandomTrack();
         };
     } catch (error) {
         console.error("আজান প্লে করতে সমস্যা:", error);
         isAzanPlaying = false;
+        isOthersPlaying = false;  // Reset flag for other scheduled audio
         updateStatus(""); // এরর হলেও স্ট্যাটাস মেসেজ মুছে ফেলা
     }
 }
@@ -240,7 +244,7 @@ setInterval(checkPrayerTimes, 60000);
 
 // গান শেষ হলে
 audioPlayer.onended = async () => {
-    if (!isAzanPlaying) {
+    if (!isAzanPlaying && !isOthersPlaying) {
         await wait(3);
         releaseWakeLock();
         playRandomTrack();
