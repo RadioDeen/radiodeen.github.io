@@ -7,7 +7,7 @@ import { getTime, getEnglishDate, getBengaliDate } from './services/dateService'
 import { getDailyHadith, Hadith } from './services/hadithService';
 import { Visualizer } from './components/Visualizer';
 import { Logo } from './components/Logo';
-import { Play, Pause, SkipForward, Radio, Clock, Volume2, ShieldCheck, AlertCircle, Hourglass, Calendar, BookOpen, MapPin } from 'lucide-react';
+import { Play, Pause, SkipForward, Radio, Clock, Volume2, ShieldCheck, Hourglass, Calendar, BookOpen, MapPin, AlertCircle } from 'lucide-react';
 
 const PRAYER_LABELS: Record<string, string> = {
   fajr: 'ফজর',
@@ -19,14 +19,14 @@ const PRAYER_LABELS: Record<string, string> = {
 };
 
 const App: React.FC = () => {
-  // Initialize with a random gojol from the list
+  // ১. র‍্যান্ডমলি প্রাথমিক গজল নির্বাচন
   const [currentGojol, setCurrentGojol] = useState<Gojol>(() => {
     const randomIndex = Math.floor(Math.random() * GOJOL_LIST.length);
     return GOJOL_LIST[randomIndex];
   });
   
-  // Set initial player state to PLAYING to attempt autoplay
-  const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.PLAYING);
+  // ইউজার প্লে বাটনে ক্লিক করার আগে প্লে স্টেট PAUSED থাকবে
+  const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.PAUSED);
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
   const [currentPrayer, setCurrentPrayer] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -55,20 +55,14 @@ const App: React.FC = () => {
       await audioRef.current.play();
       setError(null);
     } catch (err: any) {
-      // Catching autoplay block errors silently to satisfy user request of "no notification"
-      // Most browsers will resume audio on first user interaction if the state is already 'playing'
-      if (err.name === 'NotAllowedError') {
-        console.warn("Autoplay was prevented by browser. Audio will start on first user interaction.");
-      } else if (err.name !== 'AbortError') {
-        console.error("Playback error:", err);
-      }
+      console.warn("Playback failed:", err);
     }
   }, []);
 
   useEffect(() => {
     if (!audioRef.current) return;
     if ((playerState === PlayerState.PLAYING || playerState === PlayerState.AZAN) && !isTransitioning) {
-      if (audioRef.current.paused) safePlay();
+      safePlay();
     } else {
       audioRef.current.pause();
     }
@@ -77,11 +71,12 @@ const App: React.FC = () => {
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.load();
+      // শুধুমাত্র যদি আগে থেকেই প্লেয়িং স্টেটে থাকে তবেই নতুন সোর্স লোড হওয়ার পর প্লে হবে (যেমন সাফল করার সময়)
       if (playerState === PlayerState.PLAYING || playerState === PlayerState.AZAN) {
         safePlay();
       }
     }
-  }, [currentSrc]);
+  }, [currentSrc, safePlay]);
 
   useEffect(() => {
     const updateTimes = (lat: number = 23.8103, lng: number = 90.4125) => {
@@ -95,7 +90,7 @@ const App: React.FC = () => {
           updateTimes(pos.coords.latitude, pos.coords.longitude);
           setLocationName('আপনার অবস্থান');
         },
-        () => updateTimes() // Default to Dhaka if denied
+        () => updateTimes()
       );
     } else {
       updateTimes();
@@ -112,27 +107,13 @@ const App: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const updateMediaSession = useCallback((gojol: Gojol, isAzan: boolean, prayerName?: string | null) => {
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: isAzan ? `আজান (${prayerName})` : gojol.title,
-        artist: 'রেডিও দীন',
-        album: 'রেডিও দীন - গজল',
-        artwork: [{ src: 'https://i.imgur.com/F97MX9X.png', sizes: '512x512', type: 'image/png' }]
-      });
-      navigator.mediaSession.setActionHandler('play', handleTogglePlay);
-      navigator.mediaSession.setActionHandler('pause', handleTogglePlay);
-      navigator.mediaSession.setActionHandler('nexttrack', handleShuffle);
-    }
-  }, [currentGojol, playerState]);
-
   const performShuffle = useCallback(() => {
     const nextGojol = GOJOL_LIST[Math.floor(Math.random() * GOJOL_LIST.length)];
     setCurrentGojol(nextGojol);
+    // সাফল করার পর স্বয়ংক্রিয়ভাবে প্লে হওয়া উচিত কারণ এটি একটি ইউজার ইন্টারঅ্যাকশন
     setPlayerState(PlayerState.PLAYING);
     setIsTransitioning(false);
-    updateMediaSession(nextGojol, false);
-  }, [updateMediaSession]);
+  }, []);
 
   const handleShuffle = useCallback(() => {
     if (transitionTimeoutRef.current) clearTimeout(transitionTimeoutRef.current);
@@ -159,12 +140,11 @@ const App: React.FC = () => {
           setCurrentPrayer(azanName);
           setPlayerState(PlayerState.AZAN);
           setIsTransitioning(false);
-          updateMediaSession(currentGojol, true, azanName);
         }, 3000);
       }
     }, 30000);
     return () => clearInterval(interval);
-  }, [prayerTimes, playerState, currentGojol, updateMediaSession, currentPrayer, isTransitioning]);
+  }, [prayerTimes, playerState, currentPrayer, isTransitioning]);
 
   const handleAudioEnded = () => {
     setIsTransitioning(true);
@@ -179,20 +159,11 @@ const App: React.FC = () => {
         src={currentSrc}
         onEnded={handleAudioEnded}
         onError={() => {
-          // Errors unrelated to autoplay are still useful but kept minimal
-          setError("অডিও লোড হতে সমস্যা হচ্ছে। পরবর্তী গজল চেষ্টা করা হচ্ছে...");
-          setTimeout(handleShuffle, 3000);
+          setTimeout(handleShuffle, 2000);
         }}
         muted={isMuted}
         playsInline
       />
-
-      {error && (
-        <div className="fixed top-2 bg-emerald-900/90 text-white px-4 py-2 rounded-full shadow-2xl flex items-center gap-2 z-[60] animate-pulse max-w-[90vw] text-center border border-emerald-400/30 backdrop-blur-md">
-          <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 text-yellow-400" />
-          <span className="text-[11px] font-bold">{error}</span>
-        </div>
-      )}
 
       {/* Header */}
       <header className="w-full max-w-5xl flex flex-col sm:flex-row justify-between items-center sm:items-end gap-4 mb-6 py-3 border-b border-emerald-500/10">
@@ -224,8 +195,7 @@ const App: React.FC = () => {
       <div className="w-full max-w-[280px] md:max-w-[360px] glass-panel rounded-[2rem] p-7 md:p-9 shadow-2xl flex flex-col items-center relative overflow-hidden mb-10 border border-white/5">
         {isTransitioning && (
           <div className="absolute inset-0 bg-emerald-950/95 backdrop-blur-md z-20 flex flex-col items-center justify-center">
-            <Hourglass className="w-8 h-8 text-yellow-400 animate-spin mb-3" />
-            <p className="text-base font-black text-white tracking-widest animate-pulse">বিরতি</p>
+            <Hourglass className="w-8 h-8 text-yellow-400 animate-spin" />
           </div>
         )}
 
@@ -234,7 +204,8 @@ const App: React.FC = () => {
         </div>
 
         <div className="text-center mb-5 w-full min-h-[3rem] flex flex-col justify-center">
-          <h2 className="text-base md:text-lg font-normal italic text-white drop-shadow-lg leading-tight line-clamp-2 px-1">
+          {/* টাইটেল ডিজাইন: Normal, Italic, Smaller size */}
+          <h2 className="text-[13px] md:text-sm font-normal italic text-white/90 drop-shadow-sm leading-tight line-clamp-2 px-1">
             {playerState === PlayerState.AZAN ? `${currentPrayer} এর আজান` : currentGojol.title}
           </h2>
           {playerState === PlayerState.AZAN && (
@@ -289,7 +260,7 @@ const App: React.FC = () => {
               <p className="text-sm md:text-base font-bold text-white whitespace-nowrap">{time}</p>
             </div>
           )) : (
-            <p className="col-span-full text-center text-xs opacity-40 py-8 font-black animate-pulse text-emerald-100">ওয়াক্ত লোড হচ্ছে...</p>
+            <div className="col-span-full h-20"></div>
           )}
         </div>
       </div>
