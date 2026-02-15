@@ -6,7 +6,7 @@ export const GOJOL_LIST: Gojol[] = [
     id: '1',
     title: 'আমি চিৎকার করে কাঁদিতে চাহিয়া',
     artist: 'মাহমুদুল হাসান',
-    url: 'https://rawcdn.githack.com/RadioDeen/radiodeen.github.io/9f9ed60721aa0840db9b54d0752af2a434b13e1b/Islamic_Song/Ami_chitkar_kore_kadite_chahiya.mp3',
+    url: 'https://cdn.pixabay.com/download/audio/2026/02/15/audio_9fabd34df8.mp3?filename=u_3qc2kfuonp-ami_chitkar_kore_kadite_chahiya-485249.mp3',
     thumbnail: 'https://picsum.photos/seed/islam1/400/400'
   },
   {
