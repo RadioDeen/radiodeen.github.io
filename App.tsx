@@ -19,8 +19,14 @@ const PRAYER_LABELS: Record<string, string> = {
 };
 
 const App: React.FC = () => {
-  const [currentGojol, setCurrentGojol] = useState<Gojol>(GOJOL_LIST[0]);
-  const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.IDLE);
+  // Initialize with a random gojol from the list
+  const [currentGojol, setCurrentGojol] = useState<Gojol>(() => {
+    const randomIndex = Math.floor(Math.random() * GOJOL_LIST.length);
+    return GOJOL_LIST[randomIndex];
+  });
+  
+  // Set initial player state to PLAYING to attempt autoplay
+  const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.PLAYING);
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
   const [currentPrayer, setCurrentPrayer] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -49,9 +55,12 @@ const App: React.FC = () => {
       await audioRef.current.play();
       setError(null);
     } catch (err: any) {
-      if (err.name !== 'AbortError') {
-        setError("প্লেব্যাক শুরু হতে সমস্যা হচ্ছে। অনুগ্রহ করে প্লে বাটনে ক্লিক করুন।");
-        setPlayerState(PlayerState.PAUSED);
+      // Catching autoplay block errors silently to satisfy user request of "no notification"
+      // Most browsers will resume audio on first user interaction if the state is already 'playing'
+      if (err.name === 'NotAllowedError') {
+        console.warn("Autoplay was prevented by browser. Audio will start on first user interaction.");
+      } else if (err.name !== 'AbortError') {
+        console.error("Playback error:", err);
       }
     }
   }, []);
@@ -109,7 +118,7 @@ const App: React.FC = () => {
         title: isAzan ? `আজান (${prayerName})` : gojol.title,
         artist: 'রেডিও দীন',
         album: 'রেডিও দীন - গজল',
-        artwork: [{ src: 'https://picsum.photos/seed/radio/512/512', sizes: '512x512', type: 'image/png' }]
+        artwork: [{ src: 'https://i.imgur.com/F97MX9X.png', sizes: '512x512', type: 'image/png' }]
       });
       navigator.mediaSession.setActionHandler('play', handleTogglePlay);
       navigator.mediaSession.setActionHandler('pause', handleTogglePlay);
@@ -170,6 +179,7 @@ const App: React.FC = () => {
         src={currentSrc}
         onEnded={handleAudioEnded}
         onError={() => {
+          // Errors unrelated to autoplay are still useful but kept minimal
           setError("অডিও লোড হতে সমস্যা হচ্ছে। পরবর্তী গজল চেষ্টা করা হচ্ছে...");
           setTimeout(handleShuffle, 3000);
         }}
@@ -178,13 +188,13 @@ const App: React.FC = () => {
       />
 
       {error && (
-        <div className="fixed top-2 bg-red-600 text-white px-4 py-1.5 rounded-full shadow-2xl flex items-center gap-2 z-[60] animate-bounce max-w-[90vw] text-center border border-white/20">
-          <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-          <span className="text-[10px] font-bold">{error}</span>
+        <div className="fixed top-2 bg-emerald-900/90 text-white px-4 py-2 rounded-full shadow-2xl flex items-center gap-2 z-[60] animate-pulse max-w-[90vw] text-center border border-emerald-400/30 backdrop-blur-md">
+          <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 text-yellow-400" />
+          <span className="text-[11px] font-bold">{error}</span>
         </div>
       )}
 
-      {/* Header - Perfect balance for all screens */}
+      {/* Header */}
       <header className="w-full max-w-5xl flex flex-col sm:flex-row justify-between items-center sm:items-end gap-4 mb-6 py-3 border-b border-emerald-500/10">
         <div className="text-center sm:text-left flex flex-col gap-1">
           <div className="flex items-center justify-center sm:justify-start gap-3">
@@ -224,7 +234,7 @@ const App: React.FC = () => {
         </div>
 
         <div className="text-center mb-5 w-full min-h-[3rem] flex flex-col justify-center">
-          <h2 className="text-lg md:text-xl font-black text-white drop-shadow-lg leading-tight line-clamp-2 px-1">
+          <h2 className="text-base md:text-lg font-normal italic text-white drop-shadow-lg leading-tight line-clamp-2 px-1">
             {playerState === PlayerState.AZAN ? `${currentPrayer} এর আজান` : currentGojol.title}
           </h2>
           {playerState === PlayerState.AZAN && (
