@@ -197,7 +197,7 @@ const App: React.FC = () => {
         </div>
 
         <div className="flex flex-col items-center sm:items-end text-emerald-500 font-medium">
-          <div className="text-2xl md:text-4xl lg:text-5xl font-bold text-yellow-300 mb-1 font-mono drop-shadow-lg">
+          <div className="text-2xl md:text-4xl lg:text-5xl font-bold text-yellow-300 mb-1 drop-shadow-lg">
             {currentTime}
           </div>
           <div className="flex flex-col items-center sm:items-end gap-0.5 text-[9px] md:text-xs opacity-90 text-emerald-50 font-bold">

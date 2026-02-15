@@ -39,11 +39,11 @@ export const GOJOL_LIST: Gojol[] = [
   }
 ];
 
-// ৫ ওয়াক্তের জন্য আলাদা আজান (এখানে ডেমো হিসেবে আলাদা আলাদা লিঙ্ক দেওয়া হয়েছে)
+// ৫ ওয়াক্তের জন্য নির্ধারিত আজান লিঙ্ক
 export const AZAN_URLS: Record<string, string> = {
-  'ফজর': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3',
-  'যোহর': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3',
-  'আসর': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3',
-  'মাগরিব': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3',
-  'এশা': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3'
+  'ফজর': 'https://rawcdn.githack.com/RadioDeen/radiodeen.github.io/06aa1baffbb71d75c3048d75506bb59c6440f386/Azan/Fajr_Azan.mp3',
+  'যোহর': 'https://rawcdn.githack.com/RadioDeen/radiodeen.github.io/06aa1baffbb71d75c3048d75506bb59c6440f386/Azan/Zuhr_Azan.mp3',
+  'আসর': 'https://rawcdn.githack.com/RadioDeen/radiodeen.github.io/06aa1baffbb71d75c3048d75506bb59c6440f386/Azan/Asr_Azan.mp3',
+  'মাগরিব': 'https://rawcdn.githack.com/RadioDeen/radiodeen.github.io/06aa1baffbb71d75c3048d75506bb59c6440f386/Azan/Magrib_Azan.mp3',
+  'এশা': 'https://rawcdn.githack.com/RadioDeen/radiodeen.github.io/06aa1baffbb71d75c3048d75506bb59c6440f386/Azan/Isha_Azan.mp3'
 };
