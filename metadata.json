@@ -1,0 +1,7 @@
+{
+  "name": "Radio Deen (রেডিও দীন)",
+  "description": "An Islamic 24/7 radio platform for Gojols with automatic Azan switching based on prayer times.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

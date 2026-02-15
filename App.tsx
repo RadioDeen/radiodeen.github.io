@@ -1,0 +1,315 @@
+
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Gojol, PlayerState, PrayerTimes } from './types';
+import { GOJOL_LIST, AZAN_URLS } from './constants';
+import { calculatePrayerTimes, isItTimeForAzan } from './services/prayerService';
+import { getTime, getEnglishDate, getBengaliDate } from './services/dateService';
+import { getDailyHadith, Hadith } from './services/hadithService';
+import { Visualizer } from './components/Visualizer';
+import { Logo } from './components/Logo';
+import { Play, Pause, SkipForward, Radio, Clock, Volume2, ShieldCheck, AlertCircle, Hourglass, Calendar, BookOpen, MapPin } from 'lucide-react';
+
+const PRAYER_LABELS: Record<string, string> = {
+  fajr: 'ফজর',
+  sunrise: 'সূর্যোদয়',
+  dhuhr: 'যোহর',
+  asr: 'আসর',
+  maghrib: 'মাগরিব',
+  isha: 'এশা'
+};
+
+const App: React.FC = () => {
+  const [currentGojol, setCurrentGojol] = useState<Gojol>(GOJOL_LIST[0]);
+  const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.IDLE);
+  const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
+  const [currentPrayer, setCurrentPrayer] = useState<string | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [currentTime, setCurrentTime] = useState(getTime());
+  const [dailyHadith, setDailyHadith] = useState<Hadith | null>(null);
+  const [locationName, setLocationName] = useState('ঢাকা');
+  
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const transitionTimeoutRef = useRef<number | null>(null);
+
+  const currentSrc = (playerState === PlayerState.AZAN && currentPrayer) 
+    ? (AZAN_URLS[currentPrayer] || Object.values(AZAN_URLS)[0]) 
+    : currentGojol.url;
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(getTime()), 1000);
+    setDailyHadith(getDailyHadith());
+    return () => clearInterval(timer);
+  }, []);
+
+  const safePlay = useCallback(async () => {
+    if (!audioRef.current) return;
+    try {
+      await audioRef.current.play();
+      setError(null);
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        setError("প্লেব্যাক শুরু হতে সমস্যা হচ্ছে। অনুগ্রহ করে প্লে বাটনে ক্লিক করুন।");
+        setPlayerState(PlayerState.PAUSED);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!audioRef.current) return;
+    if ((playerState === PlayerState.PLAYING || playerState === PlayerState.AZAN) && !isTransitioning) {
+      if (audioRef.current.paused) safePlay();
+    } else {
+      audioRef.current.pause();
+    }
+  }, [playerState, isTransitioning, currentSrc, safePlay]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.load();
+      if (playerState === PlayerState.PLAYING || playerState === PlayerState.AZAN) {
+        safePlay();
+      }
+    }
+  }, [currentSrc]);
+
+  useEffect(() => {
+    const updateTimes = (lat: number = 23.8103, lng: number = 90.4125) => {
+      const times = calculatePrayerTimes(lat, lng);
+      setPrayerTimes(times);
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          updateTimes(pos.coords.latitude, pos.coords.longitude);
+          setLocationName('আপনার অবস্থান');
+        },
+        () => updateTimes() // Default to Dhaka if denied
+      );
+    } else {
+      updateTimes();
+    }
+
+    const timer = setInterval(() => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => updateTimes(pos.coords.latitude, pos.coords.longitude),
+          () => updateTimes()
+        );
+      }
+    }, 3600000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const updateMediaSession = useCallback((gojol: Gojol, isAzan: boolean, prayerName?: string | null) => {
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: isAzan ? `আজান (${prayerName})` : gojol.title,
+        artist: 'রেডিও দীন',
+        album: 'রেডিও দীন - গজল',
+        artwork: [{ src: 'https://picsum.photos/seed/radio/512/512', sizes: '512x512', type: 'image/png' }]
+      });
+      navigator.mediaSession.setActionHandler('play', handleTogglePlay);
+      navigator.mediaSession.setActionHandler('pause', handleTogglePlay);
+      navigator.mediaSession.setActionHandler('nexttrack', handleShuffle);
+    }
+  }, [currentGojol, playerState]);
+
+  const performShuffle = useCallback(() => {
+    const nextGojol = GOJOL_LIST[Math.floor(Math.random() * GOJOL_LIST.length)];
+    setCurrentGojol(nextGojol);
+    setPlayerState(PlayerState.PLAYING);
+    setIsTransitioning(false);
+    updateMediaSession(nextGojol, false);
+  }, [updateMediaSession]);
+
+  const handleShuffle = useCallback(() => {
+    if (transitionTimeoutRef.current) clearTimeout(transitionTimeoutRef.current);
+    setIsTransitioning(false);
+    performShuffle();
+  }, [performShuffle]);
+
+  const handleTogglePlay = useCallback(() => {
+    if (playerState === PlayerState.PLAYING || playerState === PlayerState.AZAN) {
+      setPlayerState(PlayerState.PAUSED);
+    } else {
+      setPlayerState(currentPrayer ? PlayerState.AZAN : PlayerState.PLAYING);
+    }
+  }, [playerState, currentPrayer]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!prayerTimes || isTransitioning) return;
+      const azanName = isItTimeForAzan(prayerTimes);
+      if (azanName && playerState !== PlayerState.AZAN && azanName !== currentPrayer) {
+        setIsTransitioning(true);
+        setPlayerState(PlayerState.PAUSED);
+        transitionTimeoutRef.current = window.setTimeout(() => {
+          setCurrentPrayer(azanName);
+          setPlayerState(PlayerState.AZAN);
+          setIsTransitioning(false);
+          updateMediaSession(currentGojol, true, azanName);
+        }, 3000);
+      }
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [prayerTimes, playerState, currentGojol, updateMediaSession, currentPrayer, isTransitioning]);
+
+  const handleAudioEnded = () => {
+    setIsTransitioning(true);
+    if (playerState === PlayerState.AZAN) setCurrentPrayer(null);
+    transitionTimeoutRef.current = window.setTimeout(() => performShuffle(), 3000);
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-start min-h-screen p-3 pt-1 md:pt-4 lg:pt-6 overflow-y-auto overflow-x-hidden scroll-smooth">
+      <audio
+        ref={audioRef}
+        src={currentSrc}
+        onEnded={handleAudioEnded}
+        onError={() => {
+          setError("অডিও লোড হতে সমস্যা হচ্ছে। পরবর্তী গজল চেষ্টা করা হচ্ছে...");
+          setTimeout(handleShuffle, 3000);
+        }}
+        muted={isMuted}
+        playsInline
+      />
+
+      {error && (
+        <div className="fixed top-2 bg-red-600 text-white px-4 py-1.5 rounded-full shadow-2xl flex items-center gap-2 z-[60] animate-bounce max-w-[90vw] text-center border border-white/20">
+          <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+          <span className="text-[10px] font-bold">{error}</span>
+        </div>
+      )}
+
+      {/* Header - Perfect balance for all screens */}
+      <header className="w-full max-w-5xl flex flex-col sm:flex-row justify-between items-center sm:items-end gap-4 mb-6 py-3 border-b border-emerald-500/10">
+        <div className="text-center sm:text-left flex flex-col gap-1">
+          <div className="flex items-center justify-center sm:justify-start gap-3">
+            <Radio className="text-emerald-400 w-8 h-8 md:w-12 lg:w-14 drop-shadow-md" />
+            <h1 className="text-2xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-emerald-400 via-emerald-300 to-yellow-200 bg-clip-text text-transparent leading-none py-1 block">
+              রেডিও দীন
+            </h1>
+          </div>
+          <p className="text-emerald-100 text-[10px] md:text-xs lg:text-sm opacity-80 font-bold tracking-[0.1em] mt-0.5">সুস্থ ও সুন্দর সুরের সাথে সারাক্ষণ...</p>
+        </div>
+
+        <div className="flex flex-col items-center sm:items-end text-emerald-500 font-medium">
+          <div className="text-2xl md:text-4xl lg:text-5xl font-bold text-yellow-300 mb-1 font-mono drop-shadow-lg">
+            {currentTime}
+          </div>
+          <div className="flex flex-col items-center sm:items-end gap-0.5 text-[9px] md:text-xs opacity-90 text-emerald-50 font-bold">
+            <div className="flex items-center gap-1">
+              <Calendar className="w-3 h-3 text-emerald-400" />
+              <span>{getBengaliDate()} (বাংলা)</span>
+            </div>
+            <div className="tracking-wide opacity-50 font-medium">{getEnglishDate()} (ইংরেজি)</div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Player Card */}
+      <div className="w-full max-w-[280px] md:max-w-[360px] glass-panel rounded-[2rem] p-7 md:p-9 shadow-2xl flex flex-col items-center relative overflow-hidden mb-10 border border-white/5">
+        {isTransitioning && (
+          <div className="absolute inset-0 bg-emerald-950/95 backdrop-blur-md z-20 flex flex-col items-center justify-center">
+            <Hourglass className="w-8 h-8 text-yellow-400 animate-spin mb-3" />
+            <p className="text-base font-black text-white tracking-widest animate-pulse">বিরতি</p>
+          </div>
+        )}
+
+        <div className="w-32 h-32 md:w-40 md:h-40 mb-5">
+          <Logo isPlaying={(playerState === PlayerState.PLAYING || playerState === PlayerState.AZAN) && !isTransitioning} />
+        </div>
+
+        <div className="text-center mb-5 w-full min-h-[3rem] flex flex-col justify-center">
+          <h2 className="text-lg md:text-xl font-black text-white drop-shadow-lg leading-tight line-clamp-2 px-1">
+            {playerState === PlayerState.AZAN ? `${currentPrayer} এর আজান` : currentGojol.title}
+          </h2>
+          {playerState === PlayerState.AZAN && (
+            <p className="text-yellow-400 font-black uppercase text-[9px] md:text-[10px] mt-1.5 animate-pulse tracking-[0.3em]">পবিত্র আহ্বান</p>
+          )}
+        </div>
+
+        <div className="w-full mb-6 px-3">
+          <Visualizer isPlaying={(playerState === PlayerState.PLAYING || playerState === PlayerState.AZAN) && !isTransitioning} />
+        </div>
+
+        <div className="flex items-center gap-6 mb-7">
+          <button onClick={() => setIsMuted(!isMuted)} className="p-3.5 rounded-full bg-white/5 hover:bg-white/10 transition-all active:scale-90 border border-white/5">
+            <Volume2 className={`w-5 h-5 ${isMuted ? 'text-red-500' : 'text-white'}`} />
+          </button>
+          <button onClick={handleTogglePlay} disabled={isTransitioning} className={`w-14 h-14 md:w-18 md:h-18 rounded-full flex items-center justify-center shadow-xl transition-all transform active:scale-95 ${isTransitioning ? 'bg-gray-600 opacity-50' : 'bg-emerald-500 hover:bg-emerald-400 border-2 border-white/10'}`}>
+            {(playerState === PlayerState.PLAYING || playerState === PlayerState.AZAN) && !isTransitioning ? (
+              <Pause className="w-7 h-7 md:w-9 md:h-9 text-white" />
+            ) : (
+              <Play className="w-7 h-7 md:w-9 md:h-9 text-white translate-x-0.5" />
+            )}
+          </button>
+          <button onClick={handleShuffle} className="p-3.5 rounded-full bg-white/5 hover:bg-white/10 transition-all active:scale-90 border border-white/5">
+            <SkipForward className="w-5 h-5 text-white" />
+          </button>
+        </div>
+
+        <div className="w-full grid grid-cols-2 gap-3 text-[9px] font-black text-emerald-100 uppercase tracking-widest">
+          <div className="flex items-center justify-center gap-2 bg-black/30 py-3.5 rounded-xl border border-white/5 shadow-inner">
+            <Clock className="w-3.5 h-3.5 text-emerald-400" />
+            <span>লাইভ ২৪/৭</span>
+          </div>
+          <div className="flex items-center justify-center gap-2 bg-black/30 py-3.5 rounded-xl border border-white/5 shadow-inner">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span>সুরক্ষিত</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Prayer Times Section */}
+      <div className="w-full max-w-5xl px-3 mb-10">
+        <h3 className="text-lg md:text-xl font-black mb-5 flex items-center justify-center gap-3 text-emerald-400">
+          <MapPin className="w-5 h-5" />
+          আজকের নামাজের ওয়াক্ত ({locationName})
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {prayerTimes ? Object.entries(prayerTimes).map(([key, time]) => (
+            <div key={key} className={`glass-panel p-3.5 md:p-5 rounded-2xl text-center border-emerald-500/10 transition-all duration-300 ${currentPrayer?.toLowerCase() === PRAYER_LABELS[key]?.toLowerCase() ? 'bg-emerald-500/70 border-emerald-200 scale-105 shadow-lg z-10' : ''}`}>
+              <p className="text-[9px] md:text-[10px] uppercase opacity-70 mb-1.5 font-black tracking-widest text-emerald-50">
+                {PRAYER_LABELS[key] || key}
+              </p>
+              <p className="text-sm md:text-base font-bold text-white whitespace-nowrap">{time}</p>
+            </div>
+          )) : (
+            <p className="col-span-full text-center text-xs opacity-40 py-8 font-black animate-pulse text-emerald-100">ওয়াক্ত লোড হচ্ছে...</p>
+          )}
+        </div>
+      </div>
+
+      {/* Daily Hadith Section */}
+      {dailyHadith && (
+        <div className="w-full max-w-3xl px-4 mb-12">
+          <div className="glass-panel rounded-[1.5rem] p-6 md:p-9 border-yellow-500/20 relative overflow-hidden group hover:border-emerald-500/40 transition-all shadow-lg">
+            <div className="absolute -top-3 -right-3 p-4 opacity-5 group-hover:opacity-10 transition-opacity rotate-12">
+              <BookOpen className="w-16 h-16 text-white" />
+            </div>
+            <div className="flex items-center gap-2 text-yellow-400 mb-4 font-black text-[10px] md:text-xs uppercase tracking-[0.2em]">
+              <div className="w-8 h-[2px] bg-yellow-400 rounded-full"></div>
+              আজকের হাদীস
+            </div>
+            <p className="text-white text-sm md:text-xl font-bold leading-relaxed mb-4 text-justify">
+              " {dailyHadith.text} "
+            </p>
+            <p className="text-emerald-300 font-black text-xs md:text-sm text-right opacity-80">
+              — {dailyHadith.reference}
+            </p>
+          </div>
+        </div>
+      )}
+
+      <footer className="mt-auto mb-8 text-center max-w-xs text-white/20 text-[9px] md:text-[10px] leading-relaxed pt-6 border-t border-white/5 w-full font-bold tracking-wide">
+        রেডিও দীন - আপনার প্রতিদিনের আধ্যাত্মিক সঙ্গী
+      </footer>
+    </div>
+  );
+};
+
+export default App;
