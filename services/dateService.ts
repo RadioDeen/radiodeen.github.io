@@ -69,7 +69,8 @@ export const getBengaliDate = () => {
     return num.toString().replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[parseInt(d)]);
   };
 
-  return `${toBnDigit(bnDay!)} ${bnMonths[bnMonthIndex]} ${toBnDigit(bnYear)}`;
+  // Added a comma after the month name as requested
+  return `${toBnDigit(bnDay!)} ${bnMonths[bnMonthIndex]}, ${toBnDigit(bnYear)}`;
 };
 
 export const getTime = () => {
