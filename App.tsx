@@ -133,7 +133,9 @@ const App: React.FC = () => {
             setTimeout(() => {
               setCurrentPrayer(null);
               setCurrentSchedule(null);
-              setPlayerState(playerState === PlayerState.PAUSED ? PlayerState.PAUSED : PlayerState.PLAYING);
+              // Fix: Use functional state update to avoid TypeScript narrowing issues with closures
+              // and ensure we're checking the actual current state.
+              setPlayerState(prev => prev === PlayerState.PAUSED ? PlayerState.PAUSED : PlayerState.PLAYING);
               setIsTransitioning(false);
             }, 2000);
           }
@@ -255,7 +257,7 @@ const App: React.FC = () => {
         </div>
 
         <div className="text-center mb-5 w-full min-h-[3.5rem] flex flex-col justify-center">
-          <h2 className="text-[13px] md:text-sm font-bold text-white drop-shadow-sm leading-tight line-clamp-2 px-1">
+          <h2 className="text-[13px] md:text-sm font-normal italic text-white drop-shadow-sm leading-tight line-clamp-2 px-1">
             {getDisplayTitle()}
           </h2>
           {(playerState === PlayerState.AZAN || currentPrayer) && (
