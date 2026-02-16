@@ -19,13 +19,11 @@ const PRAYER_LABELS: Record<string, string> = {
 };
 
 const App: React.FC = () => {
-  // ১. র‍্যান্ডমলি প্রাথমিক গজল নির্বাচন
   const [currentGojol, setCurrentGojol] = useState<Gojol>(() => {
     const randomIndex = Math.floor(Math.random() * GOJOL_LIST.length);
     return GOJOL_LIST[randomIndex];
   });
   
-  // ইউজার প্লে বাটনে ক্লিক করার আগে প্লে স্টেট PAUSED থাকবে
   const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.PAUSED);
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
   const [currentPrayer, setCurrentPrayer] = useState<string | null>(null);
@@ -71,7 +69,6 @@ const App: React.FC = () => {
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.load();
-      // শুধুমাত্র যদি আগে থেকেই প্লেয়িং স্টেটে থাকে তবেই নতুন সোর্স লোড হওয়ার পর প্লে হবে (যেমন সাফল করার সময়)
       if (playerState === PlayerState.PLAYING || playerState === PlayerState.AZAN) {
         safePlay();
       }
@@ -110,7 +107,6 @@ const App: React.FC = () => {
   const performShuffle = useCallback(() => {
     const nextGojol = GOJOL_LIST[Math.floor(Math.random() * GOJOL_LIST.length)];
     setCurrentGojol(nextGojol);
-    // সাফল করার পর স্বয়ংক্রিয়ভাবে প্লে হওয়া উচিত কারণ এটি একটি ইউজার ইন্টারঅ্যাকশন
     setPlayerState(PlayerState.PLAYING);
     setIsTransitioning(false);
   }, []);
@@ -204,7 +200,6 @@ const App: React.FC = () => {
         </div>
 
         <div className="text-center mb-5 w-full min-h-[3rem] flex flex-col justify-center">
-          {/* টাইটেল ডিজাইন: Normal, Italic, Smaller size */}
           <h2 className="text-[13px] md:text-sm font-normal italic text-white/90 drop-shadow-sm leading-tight line-clamp-2 px-1">
             {playerState === PlayerState.AZAN ? `${currentPrayer} এর আজান` : currentGojol.title}
           </h2>
