@@ -20,7 +20,15 @@ export enum PlayerState {
   IDLE = 'IDLE',
   PLAYING = 'PLAYING',
   PAUSED = 'PAUSED',
-  AZAN = 'AZAN'
+  AZAN = 'AZAN',
+  SCHEDULED_PROGRAM = 'SCHEDULED_PROGRAM'
+}
+
+export interface ScheduledProgram {
+  time: string; // Format: "HH:MM AM/PM" (e.g., "06:00 AM")
+  url: string;
+  title: string;
+  date?: string; // Format: "YYYY-MM-DD" (optional, for specific dates)
 }
 
 export interface AppState {

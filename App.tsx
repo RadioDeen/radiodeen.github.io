@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Gojol, PlayerState, PrayerTimes } from './types';
-import { GOJOL_LIST, AZAN_URLS } from './constants';
+import { Gojol, PlayerState, PrayerTimes, ScheduledProgram } from './types';
+import { GOJOL_LIST, AZAN_URLS, QURAN_SCHEDULE, DISCUSSION_SCHEDULE } from './constants';
 import { calculatePrayerTimes, isItTimeForAzan } from './services/prayerService';
 import { getTime, getEnglishDate, getBengaliDate } from './services/dateService';
 import { getDailyHadith, Hadith } from './services/hadithService';
 import { Visualizer } from './components/Visualizer';
 import { Logo } from './components/Logo';
-import { Play, Pause, SkipForward, Radio, Clock, Volume2, ShieldCheck, Hourglass, Calendar, BookOpen, MapPin, AlertCircle } from 'lucide-react';
+import { Play, Pause, SkipForward, Radio, Clock, Volume2, ShieldCheck, Hourglass, Calendar, BookOpen, MapPin, AudioLines } from 'lucide-react';
 
 const PRAYER_LABELS: Record<string, string> = {
   fajr: 'ফজর',
@@ -27,8 +27,8 @@ const App: React.FC = () => {
   const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.PAUSED);
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
   const [currentPrayer, setCurrentPrayer] = useState<string | null>(null);
+  const [currentSchedule, setCurrentSchedule] = useState<ScheduledProgram | null>(null);
   const [isMuted, setIsMuted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [currentTime, setCurrentTime] = useState(getTime());
   const [dailyHadith, setDailyHadith] = useState<Hadith | null>(null);
@@ -37,8 +37,11 @@ const App: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const transitionTimeoutRef = useRef<number | null>(null);
 
+  // নির্ধারিত অডিও সোর্স নির্ধারণ
   const currentSrc = (playerState === PlayerState.AZAN && currentPrayer) 
     ? (AZAN_URLS[currentPrayer] || Object.values(AZAN_URLS)[0]) 
+    : (playerState === PlayerState.SCHEDULED_PROGRAM && currentSchedule)
+    ? currentSchedule.url
     : currentGojol.url;
 
   useEffect(() => {
@@ -47,34 +50,7 @@ const App: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const safePlay = useCallback(async () => {
-    if (!audioRef.current) return;
-    try {
-      await audioRef.current.play();
-      setError(null);
-    } catch (err: any) {
-      console.warn("Playback failed:", err);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!audioRef.current) return;
-    if ((playerState === PlayerState.PLAYING || playerState === PlayerState.AZAN) && !isTransitioning) {
-      safePlay();
-    } else {
-      audioRef.current.pause();
-    }
-  }, [playerState, isTransitioning, currentSrc, safePlay]);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.load();
-      if (playerState === PlayerState.PLAYING || playerState === PlayerState.AZAN) {
-        safePlay();
-      }
-    }
-  }, [currentSrc, safePlay]);
-
+  // নামাজের ওয়াক্ত লোড করা
   useEffect(() => {
     const updateTimes = (lat: number = 23.8103, lng: number = 90.4125) => {
       const times = calculatePrayerTimes(lat, lng);
@@ -92,21 +68,99 @@ const App: React.FC = () => {
     } else {
       updateTimes();
     }
-
-    const timer = setInterval(() => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => updateTimes(pos.coords.latitude, pos.coords.longitude),
-          () => updateTimes()
-        );
-      }
-    }, 3600000);
-    return () => clearInterval(timer);
   }, []);
+
+  const safePlay = useCallback(async () => {
+    if (!audioRef.current) return;
+    try {
+      await audioRef.current.play();
+    } catch (err: any) {
+      console.warn("Playback failed:", err);
+    }
+  }, []);
+
+  // প্লেব্যাক কন্ট্রোল
+  useEffect(() => {
+    if (!audioRef.current) return;
+    if ((playerState !== PlayerState.PAUSED) && !isTransitioning) {
+      safePlay();
+    } else {
+      audioRef.current.pause();
+    }
+  }, [playerState, isTransitioning, currentSrc, safePlay]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.load();
+      if (playerState !== PlayerState.PAUSED && !isTransitioning) {
+        safePlay();
+      }
+    }
+  }, [currentSrc, safePlay]);
+
+  // বর্তমান সময় অনুযায়ী শিডিউল চেক করা (Priority Logic)
+  const getActivePriority = useCallback(() => {
+    if (!prayerTimes) return null;
+
+    const now = new Date();
+    const currentFormattedTime = getTime().split(':')[0] + ':' + getTime().split(':')[1] + ' ' + getTime().split(' ')[1];
+    const currentISODate = now.toISOString().split('T')[0];
+
+    // ১. আজান প্রায়োরিটি
+    const azanName = isItTimeForAzan(prayerTimes);
+    if (azanName) return { type: PlayerState.AZAN, name: azanName, data: null };
+
+    // ২. বিশেষ আলোচনা প্রায়োরিটি
+    const specialDiscussion = DISCUSSION_SCHEDULE.find(d => d.date === currentISODate && d.time === currentFormattedTime);
+    if (specialDiscussion) return { type: PlayerState.SCHEDULED_PROGRAM, name: null, data: specialDiscussion };
+
+    // ৩. কুরআন তেলাওয়াত প্রায়োরিটি
+    const quranRecitation = QURAN_SCHEDULE.find(q => q.time === currentFormattedTime);
+    if (quranRecitation) return { type: PlayerState.SCHEDULED_PROGRAM, name: null, data: quranRecitation };
+
+    return null;
+  }, [prayerTimes]);
+
+  // প্রতি ১ সেকেন্ড অন্তর শিডিউল চেক করে স্টেট আপডেট
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const active = getActivePriority();
+      if (!active) {
+        // যদি শিডিউল শেষ হয়ে যায় এবং বর্তমানে আজান/প্রোগ্রাম মোডে থাকে, তবে গজলে ফিরে যাবে
+        if (playerState === PlayerState.AZAN || playerState === PlayerState.SCHEDULED_PROGRAM) {
+          if (!isTransitioning) {
+            setIsTransitioning(true);
+            setTimeout(() => {
+              setCurrentPrayer(null);
+              setCurrentSchedule(null);
+              setPlayerState(playerState === PlayerState.PAUSED ? PlayerState.PAUSED : PlayerState.PLAYING);
+              setIsTransitioning(false);
+            }, 2000);
+          }
+        }
+        return;
+      }
+
+      // যদি নতুন কোনো প্রায়োরিটি ম্যাচ করে যা বর্তমানে বাজছে না
+      if (active.type === PlayerState.AZAN && currentPrayer !== active.name) {
+        setCurrentPrayer(active.name);
+        setCurrentSchedule(null);
+        setPlayerState(PlayerState.AZAN);
+      } else if (active.type === PlayerState.SCHEDULED_PROGRAM && currentSchedule?.title !== active.data?.title) {
+        setCurrentPrayer(null);
+        setCurrentSchedule(active.data);
+        setPlayerState(PlayerState.SCHEDULED_PROGRAM);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [getActivePriority, playerState, currentPrayer, currentSchedule, isTransitioning]);
 
   const performShuffle = useCallback(() => {
     const nextGojol = GOJOL_LIST[Math.floor(Math.random() * GOJOL_LIST.length)];
     setCurrentGojol(nextGojol);
+    setCurrentSchedule(null);
+    setCurrentPrayer(null);
     setPlayerState(PlayerState.PLAYING);
     setIsTransitioning(false);
   }, []);
@@ -118,34 +172,35 @@ const App: React.FC = () => {
   }, [performShuffle]);
 
   const handleTogglePlay = useCallback(() => {
-    if (playerState === PlayerState.PLAYING || playerState === PlayerState.AZAN) {
-      setPlayerState(PlayerState.PAUSED);
-    } else {
-      setPlayerState(currentPrayer ? PlayerState.AZAN : PlayerState.PLAYING);
-    }
-  }, [playerState, currentPrayer]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!prayerTimes || isTransitioning) return;
-      const azanName = isItTimeForAzan(prayerTimes);
-      if (azanName && playerState !== PlayerState.AZAN && azanName !== currentPrayer) {
-        setIsTransitioning(true);
-        setPlayerState(PlayerState.PAUSED);
-        transitionTimeoutRef.current = window.setTimeout(() => {
-          setCurrentPrayer(azanName);
+    if (playerState === PlayerState.PAUSED) {
+      // প্লে করার সময় প্রথমে চেক করবে কোনো শিডিউল আছে কিনা
+      const active = getActivePriority();
+      if (active) {
+        if (active.type === PlayerState.AZAN) {
+          setCurrentPrayer(active.name);
           setPlayerState(PlayerState.AZAN);
-          setIsTransitioning(false);
-        }, 3000);
+        } else {
+          setCurrentSchedule(active.data);
+          setPlayerState(PlayerState.SCHEDULED_PROGRAM);
+        }
+      } else {
+        setPlayerState(PlayerState.PLAYING);
       }
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [prayerTimes, playerState, currentPrayer, isTransitioning]);
+    } else {
+      setPlayerState(PlayerState.PAUSED);
+    }
+  }, [playerState, getActivePriority]);
 
   const handleAudioEnded = () => {
     setIsTransitioning(true);
-    if (playerState === PlayerState.AZAN) setCurrentPrayer(null);
-    transitionTimeoutRef.current = window.setTimeout(() => performShuffle(), 3000);
+    // যদি আজান বা শিডিউল শেষ হয়, তবে গজলে ফিরে যাবে
+    transitionTimeoutRef.current = window.setTimeout(() => performShuffle(), 2000);
+  };
+
+  const getDisplayTitle = () => {
+    if (playerState === PlayerState.AZAN || currentPrayer) return `${currentPrayer || 'পবিত্র'} আজান`;
+    if (playerState === PlayerState.SCHEDULED_PROGRAM || currentSchedule) return currentSchedule?.title;
+    return currentGojol.title;
   };
 
   return (
@@ -196,20 +251,23 @@ const App: React.FC = () => {
         )}
 
         <div className="w-32 h-32 md:w-40 md:h-40 mb-5">
-          <Logo isPlaying={(playerState === PlayerState.PLAYING || playerState === PlayerState.AZAN) && !isTransitioning} />
+          <Logo isPlaying={(playerState !== PlayerState.PAUSED) && !isTransitioning} />
         </div>
 
-        <div className="text-center mb-5 w-full min-h-[3rem] flex flex-col justify-center">
-          <h2 className="text-[13px] md:text-sm font-normal italic text-white/90 drop-shadow-sm leading-tight line-clamp-2 px-1">
-            {playerState === PlayerState.AZAN ? `${currentPrayer} এর আজান` : currentGojol.title}
+        <div className="text-center mb-5 w-full min-h-[3.5rem] flex flex-col justify-center">
+          <h2 className="text-[13px] md:text-sm font-bold text-white drop-shadow-sm leading-tight line-clamp-2 px-1">
+            {getDisplayTitle()}
           </h2>
-          {playerState === PlayerState.AZAN && (
-            <p className="text-yellow-400 font-black uppercase text-[9px] md:text-[10px] mt-1.5 animate-pulse tracking-[0.3em]">পবিত্র আহ্বান</p>
+          {(playerState === PlayerState.AZAN || currentPrayer) && (
+            <p className="text-yellow-400 font-black uppercase text-[9px] md:text-[10px] mt-2 animate-pulse tracking-[0.3em]">পবিত্র আহ্বান</p>
+          )}
+          {(playerState === PlayerState.SCHEDULED_PROGRAM || currentSchedule) && (
+            <p className="text-emerald-300 font-black uppercase text-[9px] md:text-[10px] mt-2 animate-pulse tracking-[0.3em]">বিশেষ আয়োজন</p>
           )}
         </div>
 
         <div className="w-full mb-6 px-3">
-          <Visualizer isPlaying={(playerState === PlayerState.PLAYING || playerState === PlayerState.AZAN) && !isTransitioning} />
+          <Visualizer isPlaying={(playerState !== PlayerState.PAUSED) && !isTransitioning} />
         </div>
 
         <div className="flex items-center gap-6 mb-7">
@@ -217,7 +275,7 @@ const App: React.FC = () => {
             <Volume2 className={`w-5 h-5 ${isMuted ? 'text-red-500' : 'text-white'}`} />
           </button>
           <button onClick={handleTogglePlay} disabled={isTransitioning} className={`w-14 h-14 md:w-18 md:h-18 rounded-full flex items-center justify-center shadow-xl transition-all transform active:scale-95 ${isTransitioning ? 'bg-gray-600 opacity-50' : 'bg-emerald-500 hover:bg-emerald-400 border-2 border-white/10'}`}>
-            {(playerState === PlayerState.PLAYING || playerState === PlayerState.AZAN) && !isTransitioning ? (
+            {(playerState !== PlayerState.PAUSED) && !isTransitioning ? (
               <Pause className="w-7 h-7 md:w-9 md:h-9 text-white" />
             ) : (
               <Play className="w-7 h-7 md:w-9 md:h-9 text-white translate-x-0.5" />
@@ -240,6 +298,40 @@ const App: React.FC = () => {
         </div>
       </div>
 
+      {/* Today's Events - Visual Notification */}
+      <div className="w-full max-w-5xl px-3 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="glass-panel p-5 rounded-3xl border-emerald-500/20">
+            <div className="flex items-center gap-2 mb-3 text-emerald-400 font-bold">
+              <AudioLines className="w-5 h-5" />
+              <span>প্রতিদিনের কুরআন তেলাওয়াত</span>
+            </div>
+            <div className="space-y-2">
+              {QURAN_SCHEDULE.map((q, idx) => (
+                <div key={idx} className="flex justify-between items-center text-xs opacity-80 py-2 border-b border-white/5 last:border-0">
+                  <span className={currentTime.includes(q.time) ? 'text-emerald-300 font-bold' : ''}>{q.title}</span>
+                  <span className={`font-bold ${currentTime.includes(q.time) ? 'text-emerald-400 animate-pulse' : 'text-yellow-400'}`}>{q.time}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="glass-panel p-5 rounded-3xl border-yellow-500/20">
+            <div className="flex items-center gap-2 mb-3 text-yellow-400 font-bold">
+              <Calendar className="w-5 h-5" />
+              <span>আসন্ন বিশেষ আলোচনা</span>
+            </div>
+            <div className="space-y-2">
+              {DISCUSSION_SCHEDULE.map((d, idx) => (
+                <div key={idx} className="flex justify-between items-center text-xs opacity-80 py-2 border-b border-white/5 last:border-0">
+                  <span>{d.title}</span>
+                  <span className="font-bold text-emerald-400">{d.date} | {d.time}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Prayer Times Section */}
       <div className="w-full max-w-5xl px-3 mb-10">
         <h3 className="text-lg md:text-xl font-black mb-5 flex items-center justify-center gap-3 text-emerald-400">
@@ -247,14 +339,17 @@ const App: React.FC = () => {
           আজকের নামাজের ওয়াক্ত ({locationName})
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {prayerTimes ? Object.entries(prayerTimes).map(([key, time]) => (
-            <div key={key} className={`glass-panel p-3.5 md:p-5 rounded-2xl text-center border-emerald-500/10 transition-all duration-300 ${currentPrayer?.toLowerCase() === PRAYER_LABELS[key]?.toLowerCase() ? 'bg-emerald-500/70 border-emerald-200 scale-105 shadow-lg z-10' : ''}`}>
-              <p className="text-[9px] md:text-[10px] uppercase opacity-70 mb-1.5 font-black tracking-widest text-emerald-50">
-                {PRAYER_LABELS[key] || key}
-              </p>
-              <p className="text-sm md:text-base font-bold text-white whitespace-nowrap">{time}</p>
-            </div>
-          )) : (
+          {prayerTimes ? Object.entries(prayerTimes).map(([key, time]) => {
+            const isCurrent = currentPrayer?.toLowerCase() === PRAYER_LABELS[key]?.toLowerCase() || currentTime.includes(time);
+            return (
+              <div key={key} className={`glass-panel p-3.5 md:p-5 rounded-2xl text-center border-emerald-500/10 transition-all duration-300 ${isCurrent ? 'bg-emerald-500/70 border-emerald-200 scale-105 shadow-lg z-10' : ''}`}>
+                <p className="text-[9px] md:text-[10px] uppercase opacity-70 mb-1.5 font-black tracking-widest text-emerald-50">
+                  {PRAYER_LABELS[key] || key}
+                </p>
+                <p className={`text-sm md:text-base font-bold whitespace-nowrap ${isCurrent ? 'text-yellow-300' : 'text-white'}`}>{time}</p>
+              </div>
+            );
+          }) : (
             <div className="col-span-full h-20"></div>
           )}
         </div>
