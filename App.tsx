@@ -1,13 +1,13 @@
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Gojol, PlayerState, PrayerTimes, ScheduledProgram } from './types';
-import { GOJOL_LIST, AZAN_URLS, QURAN_SCHEDULE, DISCUSSION_SCHEDULE } from './constants';
+import { GOJOL_LIST, AZAN_URLS, QURAN_SCHEDULE, DISCUSSION_SCHEDULE, MORNING_QURAN_LIST, NIGHT_QURAN_LIST } from './constants';
 import { calculatePrayerTimes, isItTimeForAzan } from './services/prayerService';
 import { getTime, getEnglishDate, getBengaliDate } from './services/dateService';
 import { getDailyHadith, Hadith } from './services/hadithService';
 import { Visualizer } from './components/Visualizer';
 import { Logo } from './components/Logo';
-import { Play, Pause, SkipForward, Radio, Clock, Volume2, ShieldCheck, Hourglass, Calendar, BookOpen, MapPin, AudioLines } from 'lucide-react';
+import { Play, Pause, SkipForward, Radio, Clock, Volume2, ShieldCheck, Hourglass, Calendar, BookOpen, MapPin, AudioLines, List, X } from 'lucide-react';
 
 const PRAYER_LABELS: Record<string, string> = {
   fajr: 'ফজর',
@@ -33,10 +33,17 @@ const App: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(getTime());
   const [dailyHadith, setDailyHadith] = useState<Hadith | null>(null);
   const [locationName, setLocationName] = useState('ঢাকা');
+  const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const transitionTimeoutRef = useRef<number | null>(null);
   const programInProgressRef = useRef<boolean>(false);
+
+  // দিনের ওপর ভিত্তি করে রেন্ডম ইনডেক্স জেনারেট করা
+  const dailySeed = useMemo(() => {
+    const now = new Date();
+    return Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+  }, [currentTime.split(' ')[2]]); // তারিখ পরিবর্তন হলে আপডেট হবে
 
   // নির্ধারিত অডিও সোর্স নির্ধারণ
   const currentSrc = (playerState === PlayerState.AZAN && currentPrayer) 
@@ -76,7 +83,7 @@ const App: React.FC = () => {
     try {
       await audioRef.current.play();
     } catch (err: any) {
-      console.warn("Playback blocked by browser or failed. Waiting for user interaction.");
+      console.warn("Playback blocked by browser.");
     }
   }, []);
 
@@ -99,11 +106,10 @@ const App: React.FC = () => {
     }
   }, [currentSrc, safePlay]);
 
-  // বর্তমান সময় অনুযায়ী প্রায়োরিটি চেক (Start Minute matching)
+  // বর্তমান সময় অনুযায়ী প্রায়োরিটি চেক
   const getActivePriority = useCallback(() => {
     if (!prayerTimes) return null;
 
-    // বর্তমান সময়ের HH:MM AM/PM ফরম্যাট বের করা
     const timeParts = getTime().split(' ');
     const hmParts = timeParts[0].split(':');
     const formattedTime = `${hmParts[0]}:${hmParts[1]} ${timeParts[1]}`;
@@ -113,31 +119,32 @@ const App: React.FC = () => {
     const azanName = isItTimeForAzan(prayerTimes);
     if (azanName) return { type: PlayerState.AZAN, name: azanName, data: null };
 
-    // ২. বিশেষ আলোচনা প্রায়োরিটি (নির্দিষ্ট তারিখ ও সময়)
+    // ২. বিশেষ আলোচনা প্রায়োরিটি
     const specialDiscussion = DISCUSSION_SCHEDULE.find(d => d.date === currentISODate && d.time === formattedTime);
     if (specialDiscussion) return { type: PlayerState.SCHEDULED_PROGRAM, name: null, data: specialDiscussion };
 
-    // ৩. কুরআন তেলাওয়াত প্রায়োরিটি (প্রতিদিনের সময়)
-    const quranRecitation = QURAN_SCHEDULE.find(q => q.time === formattedTime);
-    if (quranRecitation) return { type: PlayerState.SCHEDULED_PROGRAM, name: null, data: quranRecitation };
+    // ৩. কুরআন তেলাওয়াত প্রায়োরিটি (রেন্ডম সিলেকশন সহ)
+    const quranEntry = QURAN_SCHEDULE.find(q => q.time === formattedTime);
+    if (quranEntry) {
+      const isMorning = quranEntry.time.includes('এএম');
+      const list = isMorning ? MORNING_QURAN_LIST : NIGHT_QURAN_LIST;
+      const selected = list[dailySeed % list.length];
+      return { 
+        type: PlayerState.SCHEDULED_PROGRAM, 
+        name: null, 
+        data: { ...quranEntry, url: selected.url, title: selected.title } 
+      };
+    }
 
     return null;
-  }, [prayerTimes]);
+  }, [prayerTimes, dailySeed]);
 
-  // প্রতি ১ সেকেন্ড অন্তর শিডিউল চেক করে স্টেট আপডেট
+  // প্রতি ১ সেকেন্ড অন্তর শিডিউল চেক
   useEffect(() => {
     const interval = setInterval(() => {
       const active = getActivePriority();
-      
-      // যদি কোনো শিডিউল না থাকে
-      if (!active) {
-        // যদি বর্তমানে আজান/প্রোগ্রাম মোডে না থাকে, তবে কিছু করার দরকার নেই
-        // আর যদি আজান/প্রোগ্রাম মোডে থাকে, তবে সেটা অডিও শেষ হওয়া (onEnded) পর্যন্ত অপেক্ষা করবে
-        return;
-      }
+      if (!active) return;
 
-      // যদি নতুন কোনো প্রায়োরিটি ম্যাচ করে যা বর্তমানে বাজছে না
-      // আজান হলে সব বন্ধ করে আজান বাজবে
       if (active.type === PlayerState.AZAN && currentPrayer !== active.name) {
         if (!isTransitioning) {
           setIsTransitioning(true);
@@ -151,7 +158,6 @@ const App: React.FC = () => {
           }, 3000);
         }
       } 
-      // কুরআন/আলোচনা হলে এবং বর্তমানে কোনো প্রোগ্রাম বা আজান না চললে তা শুরু হবে
       else if (active.type === PlayerState.SCHEDULED_PROGRAM && !programInProgressRef.current && playerState !== PlayerState.AZAN) {
         if (!isTransitioning && currentSchedule?.title !== active.data?.title) {
           setIsTransitioning(true);
@@ -209,7 +215,6 @@ const App: React.FC = () => {
   }, [playerState, getActivePriority]);
 
   const handleAudioEnded = () => {
-    // অডিও শেষ হলে গজলে ফিরে যাবে
     setIsTransitioning(true);
     programInProgressRef.current = false;
     transitionTimeoutRef.current = window.setTimeout(() => performShuffle(), 2000);
@@ -222,14 +227,12 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen p-3 pt-1 md:pt-4 lg:pt-6 overflow-y-auto overflow-x-hidden scroll-smooth">
+    <div className="flex flex-col items-center justify-start min-h-screen p-3 pt-1 md:pt-4 lg:pt-6 overflow-y-auto overflow-x-hidden scroll-smooth relative">
       <audio
         ref={audioRef}
         src={currentSrc}
         onEnded={handleAudioEnded}
-        onError={() => {
-          setTimeout(handleShuffle, 2000);
-        }}
+        onError={() => setTimeout(handleShuffle, 2000)}
         muted={isMuted}
         playsInline
       />
@@ -316,40 +319,6 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* Today's Events - Visual Notification */}
-      <div className="w-full max-w-5xl px-3 mb-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="glass-panel p-5 rounded-3xl border-emerald-500/20">
-            <div className="flex items-center gap-2 mb-3 text-emerald-400 font-bold">
-              <AudioLines className="w-5 h-5" />
-              <span>প্রতিদিনের কুরআন তেলাওয়াত</span>
-            </div>
-            <div className="space-y-2">
-              {QURAN_SCHEDULE.map((q, idx) => (
-                <div key={idx} className="flex justify-between items-center text-xs opacity-80 py-2 border-b border-white/5 last:border-0">
-                  <span className={currentTime.includes(q.time) ? 'text-emerald-300 font-bold' : ''}>{q.title}</span>
-                  <span className={`font-bold ${currentTime.includes(q.time) ? 'text-emerald-400 animate-pulse' : 'text-yellow-400'}`}>{q.time}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="glass-panel p-5 rounded-3xl border-yellow-500/20">
-            <div className="flex items-center gap-2 mb-3 text-yellow-400 font-bold">
-              <Calendar className="w-5 h-5" />
-              <span>আসন্ন বিশেষ আলোচনা</span>
-            </div>
-            <div className="space-y-2">
-              {DISCUSSION_SCHEDULE.map((d, idx) => (
-                <div key={idx} className="flex justify-between items-center text-xs opacity-80 py-2 border-b border-white/5 last:border-0">
-                  <span>{d.title}</span>
-                  <span className="font-bold text-emerald-400">{d.date} | {d.time}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Prayer Times Section */}
       <div className="w-full max-w-5xl px-3 mb-10">
         <h3 className="text-lg md:text-xl font-black mb-5 flex items-center justify-center gap-3 text-emerald-400">
@@ -375,7 +344,7 @@ const App: React.FC = () => {
 
       {/* Daily Hadith Section */}
       {dailyHadith && (
-        <div className="w-full max-w-3xl px-4 mb-12">
+        <div className="w-full max-w-3xl px-4 mb-20">
           <div className="glass-panel rounded-[1.5rem] p-6 md:p-9 border-yellow-500/20 relative overflow-hidden group hover:border-emerald-500/40 transition-all shadow-lg">
             <div className="absolute -top-3 -right-3 p-4 opacity-5 group-hover:opacity-10 transition-opacity rotate-12">
               <BookOpen className="w-16 h-16 text-white" />
@@ -393,6 +362,65 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Floating Menu Button for Schedules */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button 
+          onClick={() => setIsScheduleOpen(!isScheduleOpen)}
+          className={`w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(16,185,129,0.3)] transition-all transform active:scale-95 ${isScheduleOpen ? 'bg-red-500 rotate-90' : 'bg-emerald-500 hover:bg-emerald-400 hover:scale-110'}`}
+        >
+          {isScheduleOpen ? <X className="w-6 h-6 text-white" /> : <List className="w-6 h-6 text-white" />}
+        </button>
+
+        {/* Schedule Overlay Window */}
+        {isScheduleOpen && (
+          <div className="absolute bottom-20 right-0 w-[280px] md:w-[350px] glass-panel rounded-3xl p-6 shadow-2xl border-emerald-500/30 animate-in fade-in slide-in-from-bottom-5 duration-300 overflow-hidden">
+            <div className="max-h-[70vh] overflow-y-auto pr-1">
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-4 text-emerald-400 font-black text-sm uppercase tracking-wider">
+                  <AudioLines className="w-4 h-4" />
+                  <span>আজকের কুরআন তেলাওয়াত</span>
+                </div>
+                <div className="space-y-3">
+                  {QURAN_SCHEDULE.map((q, idx) => {
+                    const isMorning = q.time.includes('এএম');
+                    const list = isMorning ? MORNING_QURAN_LIST : NIGHT_QURAN_LIST;
+                    const dailyTitle = list[dailySeed % list.length].title;
+                    return (
+                      <div key={idx} className={`p-3 rounded-xl border transition-all ${currentTime.includes(q.time) ? 'bg-emerald-500/20 border-emerald-400' : 'bg-black/20 border-white/5'}`}>
+                        <p className="text-[11px] text-white/90 font-bold mb-1">{dailyTitle}</p>
+                        <p className="text-[10px] font-black text-emerald-400">{q.time}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-4 text-yellow-400 font-black text-sm uppercase tracking-wider">
+                  <Calendar className="w-4 h-4" />
+                  <span>আসন্ন আলোচনা</span>
+                </div>
+                <div className="space-y-3">
+                  {DISCUSSION_SCHEDULE.map((d, idx) => (
+                    <div key={idx} className="p-3 rounded-xl bg-black/20 border border-white/5">
+                      <p className="text-[11px] text-white/90 font-bold mb-1">{d.title}</p>
+                      <div className="flex justify-between items-center text-[10px] font-black text-yellow-500">
+                        <span>{d.date}</span>
+                        <span>{d.time}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-4 pt-4 border-t border-white/5 text-center">
+              <p className="text-[9px] text-white/30 font-bold tracking-widest uppercase">রেডিও দীন শিডিউল</p>
+            </div>
+          </div>
+        )}
+      </div>
 
       <footer className="mt-auto mb-8 text-center max-w-xs text-white/20 text-[9px] md:text-[10px] leading-relaxed pt-6 border-t border-white/5 w-full font-bold tracking-wide">
         রেডিও দীন - আপনার প্রতিদিনের আধ্যাত্মিক সঙ্গী
