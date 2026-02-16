@@ -36,6 +36,7 @@ const App: React.FC = () => {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const transitionTimeoutRef = useRef<number | null>(null);
+  const programInProgressRef = useRef<boolean>(false);
 
   // নির্ধারিত অডিও সোর্স নির্ধারণ
   const currentSrc = (playerState === PlayerState.AZAN && currentPrayer) 
@@ -75,7 +76,7 @@ const App: React.FC = () => {
     try {
       await audioRef.current.play();
     } catch (err: any) {
-      console.warn("Playback failed:", err);
+      console.warn("Playback blocked by browser or failed. Waiting for user interaction.");
     }
   }, []);
 
@@ -98,24 +99,26 @@ const App: React.FC = () => {
     }
   }, [currentSrc, safePlay]);
 
-  // বর্তমান সময় অনুযায়ী শিডিউল চেক করা (Priority Logic)
+  // বর্তমান সময় অনুযায়ী প্রায়োরিটি চেক (Start Minute matching)
   const getActivePriority = useCallback(() => {
     if (!prayerTimes) return null;
 
-    const now = new Date();
-    const currentFormattedTime = getTime().split(':')[0] + ':' + getTime().split(':')[1] + ' ' + getTime().split(' ')[1];
-    const currentISODate = now.toISOString().split('T')[0];
+    // বর্তমান সময়ের HH:MM AM/PM ফরম্যাট বের করা
+    const timeParts = getTime().split(' ');
+    const hmParts = timeParts[0].split(':');
+    const formattedTime = `${hmParts[0]}:${hmParts[1]} ${timeParts[1]}`;
+    const currentISODate = new Date().toISOString().split('T')[0];
 
     // ১. আজান প্রায়োরিটি
     const azanName = isItTimeForAzan(prayerTimes);
     if (azanName) return { type: PlayerState.AZAN, name: azanName, data: null };
 
-    // ২. বিশেষ আলোচনা প্রায়োরিটি
-    const specialDiscussion = DISCUSSION_SCHEDULE.find(d => d.date === currentISODate && d.time === currentFormattedTime);
+    // ২. বিশেষ আলোচনা প্রায়োরিটি (নির্দিষ্ট তারিখ ও সময়)
+    const specialDiscussion = DISCUSSION_SCHEDULE.find(d => d.date === currentISODate && d.time === formattedTime);
     if (specialDiscussion) return { type: PlayerState.SCHEDULED_PROGRAM, name: null, data: specialDiscussion };
 
-    // ৩. কুরআন তেলাওয়াত প্রায়োরিটি
-    const quranRecitation = QURAN_SCHEDULE.find(q => q.time === currentFormattedTime);
+    // ৩. কুরআন তেলাওয়াত প্রায়োরিটি (প্রতিদিনের সময়)
+    const quranRecitation = QURAN_SCHEDULE.find(q => q.time === formattedTime);
     if (quranRecitation) return { type: PlayerState.SCHEDULED_PROGRAM, name: null, data: quranRecitation };
 
     return null;
@@ -125,33 +128,42 @@ const App: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       const active = getActivePriority();
+      
+      // যদি কোনো শিডিউল না থাকে
       if (!active) {
-        // যদি শিডিউল শেষ হয়ে যায় এবং বর্তমানে আজান/প্রোগ্রাম মোডে থাকে, তবে গজলে ফিরে যাবে
-        if (playerState === PlayerState.AZAN || playerState === PlayerState.SCHEDULED_PROGRAM) {
-          if (!isTransitioning) {
-            setIsTransitioning(true);
-            setTimeout(() => {
-              setCurrentPrayer(null);
-              setCurrentSchedule(null);
-              // Fix: Use functional state update to avoid TypeScript narrowing issues with closures
-              // and ensure we're checking the actual current state.
-              setPlayerState(prev => prev === PlayerState.PAUSED ? PlayerState.PAUSED : PlayerState.PLAYING);
-              setIsTransitioning(false);
-            }, 2000);
-          }
-        }
+        // যদি বর্তমানে আজান/প্রোগ্রাম মোডে না থাকে, তবে কিছু করার দরকার নেই
+        // আর যদি আজান/প্রোগ্রাম মোডে থাকে, তবে সেটা অডিও শেষ হওয়া (onEnded) পর্যন্ত অপেক্ষা করবে
         return;
       }
 
       // যদি নতুন কোনো প্রায়োরিটি ম্যাচ করে যা বর্তমানে বাজছে না
+      // আজান হলে সব বন্ধ করে আজান বাজবে
       if (active.type === PlayerState.AZAN && currentPrayer !== active.name) {
-        setCurrentPrayer(active.name);
-        setCurrentSchedule(null);
-        setPlayerState(PlayerState.AZAN);
-      } else if (active.type === PlayerState.SCHEDULED_PROGRAM && currentSchedule?.title !== active.data?.title) {
-        setCurrentPrayer(null);
-        setCurrentSchedule(active.data);
-        setPlayerState(PlayerState.SCHEDULED_PROGRAM);
+        if (!isTransitioning) {
+          setIsTransitioning(true);
+          setPlayerState(PlayerState.PAUSED);
+          transitionTimeoutRef.current = window.setTimeout(() => {
+            setCurrentPrayer(active.name);
+            setCurrentSchedule(null);
+            setPlayerState(PlayerState.AZAN);
+            programInProgressRef.current = true;
+            setIsTransitioning(false);
+          }, 3000);
+        }
+      } 
+      // কুরআন/আলোচনা হলে এবং বর্তমানে কোনো প্রোগ্রাম বা আজান না চললে তা শুরু হবে
+      else if (active.type === PlayerState.SCHEDULED_PROGRAM && !programInProgressRef.current && playerState !== PlayerState.AZAN) {
+        if (!isTransitioning && currentSchedule?.title !== active.data?.title) {
+          setIsTransitioning(true);
+          setPlayerState(PlayerState.PAUSED);
+          transitionTimeoutRef.current = window.setTimeout(() => {
+            setCurrentPrayer(null);
+            setCurrentSchedule(active.data);
+            setPlayerState(PlayerState.SCHEDULED_PROGRAM);
+            programInProgressRef.current = true;
+            setIsTransitioning(false);
+          }, 3000);
+        }
       }
     }, 1000);
 
@@ -163,6 +175,7 @@ const App: React.FC = () => {
     setCurrentGojol(nextGojol);
     setCurrentSchedule(null);
     setCurrentPrayer(null);
+    programInProgressRef.current = false;
     setPlayerState(PlayerState.PLAYING);
     setIsTransitioning(false);
   }, []);
@@ -175,18 +188,20 @@ const App: React.FC = () => {
 
   const handleTogglePlay = useCallback(() => {
     if (playerState === PlayerState.PAUSED) {
-      // প্লে করার সময় প্রথমে চেক করবে কোনো শিডিউল আছে কিনা
       const active = getActivePriority();
       if (active) {
         if (active.type === PlayerState.AZAN) {
           setCurrentPrayer(active.name);
           setPlayerState(PlayerState.AZAN);
+          programInProgressRef.current = true;
         } else {
           setCurrentSchedule(active.data);
           setPlayerState(PlayerState.SCHEDULED_PROGRAM);
+          programInProgressRef.current = true;
         }
       } else {
         setPlayerState(PlayerState.PLAYING);
+        programInProgressRef.current = false;
       }
     } else {
       setPlayerState(PlayerState.PAUSED);
@@ -194,8 +209,9 @@ const App: React.FC = () => {
   }, [playerState, getActivePriority]);
 
   const handleAudioEnded = () => {
+    // অডিও শেষ হলে গজলে ফিরে যাবে
     setIsTransitioning(true);
-    // যদি আজান বা শিডিউল শেষ হয়, তবে গজলে ফিরে যাবে
+    programInProgressRef.current = false;
     transitionTimeoutRef.current = window.setTimeout(() => performShuffle(), 2000);
   };
 
