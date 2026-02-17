@@ -305,12 +305,12 @@ const App: React.FC = () => {
               </div>
             </div>
             <div className="mt-4 pt-4 border-t border-white/5 text-center">
-              <p className="text-[9px] text-white/20 font-bold tracking-widest uppercase">রেডিও দীন ডিজিটাল শিডিউল</p>
+              <p className="text-[9px] text-white/20 font-bold tracking-widest uppercase">রেডিও দীন শিডিউল</p>
             </div>
           </div>
         )}
       </div>
-      <footer className="mt-auto mb-8 text-center text-white/20 text-[9px] font-bold tracking-wide">রেডিও দীন - আপনার প্রতিদিনের আধ্যাত্মিক সঙ্গী</footer>
+      <footer className="mt-auto mb-8 text-center text-white/20 text-[11px] font-bold tracking-wide">রেডিও দীন - আপনার প্রতিদিনের আধ্যাত্মিক সঙ্গী</footer>
     </div>
   );
 };
