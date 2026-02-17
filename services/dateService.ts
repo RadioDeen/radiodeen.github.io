@@ -3,6 +3,11 @@ export const toBnDigit = (num: number | string) => {
   return num.toString().replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[parseInt(d)]);
 };
 
+export const toEnDigit = (num: string) => {
+  const bnDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+  return num.replace(/[০-৯]/g, d => bnDigits.indexOf(d).toString());
+};
+
 export const getEnglishDate = () => {
   return new Intl.DateTimeFormat('bn-BD', {
     day: 'numeric',
@@ -37,7 +42,6 @@ export const getBengaliDate = () => {
 
   const durations = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, isLeapYear ? 30 : 29, 30];
   let tempDays = dayInBnYear;
-  let bnMonthIndex = 0;
   for (let i = 0; i < 12; i++) {
     if (tempDays <= durations[i]) {
       return `${toBnDigit(tempDays)} ${bnMonths[i]}, ${toBnDigit(bnYear)}`;
@@ -47,6 +51,21 @@ export const getBengaliDate = () => {
   return '';
 };
 
+/**
+ * রিটার্ন করে "10:45 AM" ফরম্যাটে (ইন্টারনাল ম্যাচিং এর জন্য)
+ */
+export const getNormalizedCurrentTime = () => {
+  const now = new Date();
+  let hours = now.getHours();
+  const minutes = now.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12;
+  return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+};
+
+/**
+ * রিটার্ন করে "১০:৪৫:০৫ এএম" (ডিসপ্লে এর জন্য)
+ */
 export const getTime = () => {
   const now = new Date();
   let hours = now.getHours();
@@ -54,16 +73,17 @@ export const getTime = () => {
   const seconds = now.getSeconds();
   const ampm = hours >= 12 ? 'পিএম' : 'এএম';
   hours = hours % 12 || 12;
-  
   return `${toBnDigit(hours)}:${toBnDigit(minutes.toString().padStart(2, '0'))}:${toBnDigit(seconds.toString().padStart(2, '0'))} ${ampm}`;
 };
 
-// এই ফাংশনটি শিডিউল ম্যাচ করার জন্য (সেকেন্ড ছাড়া)
-export const getLogicTime = () => {
-  const now = new Date();
-  let hours = now.getHours();
-  const minutes = now.getMinutes();
-  const ampm = hours >= 12 ? 'পিএম' : 'এএম';
-  hours = hours % 12 || 12;
-  return `${toBnDigit(hours)}:${toBnDigit(minutes.toString().padStart(2, '0'))} ${ampm}`;
+/**
+ * যে কোনো সময় স্ট্রিংকে (বাংলা বা ইংরেজি) "10:45 AM" ফরম্যাটে নিয়ে যায়
+ */
+export const normalizeTimeInput = (timeStr: string) => {
+  let normalized = toEnDigit(timeStr)
+    .replace('এএম', 'AM')
+    .replace('পিএম', 'PM')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return normalized;
 };
