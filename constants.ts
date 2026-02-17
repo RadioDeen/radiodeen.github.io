@@ -99,6 +99,216 @@ export const GOJOL_LIST: Gojol[] = [
     artist: ' ',
     url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771312456/Hardam_Allah_uihcy6.mp3',
     thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '15',
+    title: 'তুমি জাহানের সেরা',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771330406/Tumi_jahaner_sera_jwkkoz.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '16',
+    title: 'রহম ডর',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771330053/Rohom_Dor_rfnar7.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '17',
+    title: 'শেষ আশ্রয়',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771330051/Shesh_ashroy_jw5vjq.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '18',
+    title: 'পাপের পাহাড়',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771330050/Paper_pahar_wy4svf.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '19',
+    title: 'তোমারি যিয়ারাত',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771330046/Tomari_jiyarot_bqgtis.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '20',
+    title: 'রাত-জাগা পাখিরা',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771330045/Rat_jaga_pakhira_rxkcrd.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '21',
+    title: 'ওসমান হাদি মাহদির ঝংকার',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771330040/Osman_Hadi_Mahdir_Jhongkar_prnqrg.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '22',
+    title: 'অলি-আল্লাহ’র বাংলাদেশ',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771330032/Oli_Allahr_bangladesh_y6fuq8.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '23',
+    title: 'নতুন ভোরের আলো',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329998/Notun_Vorer_Alo_frfwok.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '24',
+    title: 'নয়নের মনি',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329992/Noyoner_moni_rncvfm.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '25',
+    title: 'নামাজকে বলোনা কাজ আছে',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329983/Namajke_bolona_kaj_ache_a6sxlb.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '26',
+    title: 'নীল আসমানের কুরান',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329978/Nil_Asmaner_Quran_zhxlfv.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '27',
+    title: 'নবীজির বাড়ি',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329966/Nabijir_bari_xjwure.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '28',
+    title: 'মৃত্যুর কাছাকাছি',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329968/Mrittur_Kachakachi_a9musk.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '29',
+    title: 'নাত ফিউশন',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329960/Naat_Fusion_egkiu6.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '30',
+    title: 'মাদীনা জান',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329959/Madina_jan_e5sbcl.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '31',
+    title: 'মইরা গেলে ফিরা আসেনা',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329959/Moira_gele_fira_asena_xlgfg3.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '32',
+    title: 'মনের ঘর',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329949/Moner_Ghor_grmpaj.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '33',
+    title: 'মাওলা কেন আইলাম রে',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329943/Mawla_keno_ailamre_dflasa.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '34',
+    title: 'একদিন তোমারি নাম',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329895/Ekdin_tomari_nam_jrluq7.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '35',
+    title: 'কেউ বুঝবে না',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329895/Keu_Bujhbe_Na_usgffm.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '36',
+    title: 'খুসরাভি আছি লাগি',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329892/Khusravi_Achi_Lagi_Na_Sarwari_Achi_Lagi_bqhyff.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '37',
+    title: 'হাদি তুই ফিরে আয়',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329876/Hadi_Tui_Fire_Ay_mfm0ct.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '38',
+    title: 'জানাজা',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329874/Janaja_ymwj1p.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '39',
+    title: 'হাদির জিন্দাবাদ',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329865/Hadir_Jindabad_cs9gue.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '40',
+    title: 'ঢেউয়ের কাতার কক্সবাজার',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329809/Deuer_cox_bazar_x740ay.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '41',
+    title: 'ডোরাকাটা এক বাঘ',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329802/Dora_Kata_Ek_Bagh_rtepis.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '42',
+    title: 'আত্মদমনের গান',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329661/Attodomoner_gan_igtswx.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '43',
+    title: 'আজ খুব পড়ছে মনে মাকে',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329654/Aj_khub_porche_mone_maake_gozfkd.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '44',
+    title: 'বৃষ্টি বৃষ্টি দিন',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329644/Brishti_Brishti_Din_lpgsj1.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
   }
 ];
 
