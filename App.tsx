@@ -120,7 +120,6 @@ const App: React.FC = () => {
 
     const quran = QURAN_SCHEDULE.find(q => normalizeTimeInput(q.time) === normalizedNow);
     if (quran) {
-      // সকাল ০৬:০০টার জন্য স্পেশাল লিস্ট, বাকি সময়ের জন্য জেনারেল লিস্ট
       const isMorning = normalizeTimeInput(quran.time) === '6:00 AM';
       const list = isMorning ? MORNING_QURAN_PLAYLIST : QURAN_PLAYLIST;
       const selected = list[dailySeed % list.length];
@@ -278,14 +277,14 @@ const App: React.FC = () => {
         <div className="w-full grid grid-cols-2 gap-3">
           <button 
             onClick={() => toggleMode(PlayMode.GOJOL)}
-            className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl border transition-all ${activeMode === PlayMode.GOJOL ? 'bg-emerald-500 border-emerald-400 shadow-lg scale-105' : 'bg-black/30 border-white/5 opacity-60'}`}
+            className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl border transition-all ${activeMode === PlayMode.GOJOL ? 'bg-emerald-500 border-emerald-400 shadow-lg' : 'bg-black/30 border-white/5 opacity-60'}`}
           >
             <Music className={`w-4 h-4 ${activeMode === PlayMode.GOJOL ? 'text-white' : 'text-emerald-400'}`} />
             <span className="text-[10px] font-black text-white uppercase tracking-widest">ইসলামী সংগীত</span>
           </button>
           <button 
             onClick={() => toggleMode(PlayMode.QURAN)}
-            className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl border transition-all ${activeMode === PlayMode.QURAN ? 'bg-emerald-500 border-emerald-400 shadow-lg scale-105' : 'bg-black/30 border-white/5 opacity-60'}`}
+            className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl border transition-all ${activeMode === PlayMode.QURAN ? 'bg-emerald-500 border-emerald-400 shadow-lg' : 'bg-black/30 border-white/5 opacity-60'}`}
           >
             <BookText className={`w-4 h-4 ${activeMode === PlayMode.QURAN ? 'text-white' : 'text-emerald-400'}`} />
             <span className="text-[10px] font-black text-white uppercase tracking-widest">কুরআন তিলাওয়াত</span>
@@ -338,7 +337,6 @@ const App: React.FC = () => {
                 <div className="space-y-2">
                   {QURAN_SCHEDULE.map((q, idx) => {
                     const isActive = normalizeTimeInput(q.time) === getNormalizedCurrentTime();
-                    // শিডিউল দেখানোর সময় সঠিক লিস্ট থেকে টাইটেল নেওয়া হচ্ছে
                     const isMorning = normalizeTimeInput(q.time) === '6:00 AM';
                     const list = isMorning ? MORNING_QURAN_PLAYLIST : QURAN_PLAYLIST;
                     const qTitle = list[dailySeed % list.length].title;
