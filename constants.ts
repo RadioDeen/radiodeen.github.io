@@ -332,7 +332,7 @@ export const QURAN_SCHEDULE: ScheduledProgram[] = [
     title: "দিনের বরকতময় শুরু"
   },
   {
-    time: "০২:৪৬ পিএম", 
+    time: "০২:৫৫ পিএম", 
     url: "", 
     title: "রাতের প্রশান্তি"
   }
