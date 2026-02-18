@@ -309,6 +309,48 @@ export const GOJOL_LIST: Gojol[] = [
     artist: ' ',
     url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771329644/Brishti_Brishti_Din_lpgsj1.mp3',
     thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '45',
+    title: 'রঙ্গিন হৃদয়',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771406168/Ronghin_Hridoy_k1ryg4.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '46',
+    title: 'হাসনাহেনার হাসি',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771406183/Hasnahenar_Hashi_a5pbbj.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '47',
+    title: 'সিয়ামের নদী',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771406185/Siyamer_Nodi_wehepa.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '48',
+    title: 'আল্লাহ তুমি অপরূপ',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771406185/Allah_Tumi_Oporup_npnjpy.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '49',
+    title: 'বিবেক আজ মরে গেছে',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771406182/Bibek_aj_more_geche_sxkeio.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '50',
+    title: 'গাজার জন্য হৃদয় কাঁদে',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771406191/Ga-zar_Jonno_Hridoy_Kade_grzjap.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
   }
 ];
 
