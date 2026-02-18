@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Gojol, PlayerState, PrayerTimes, ScheduledProgram, PlayMode } from './types';
-import { GOJOL_LIST, AZAN_URLS, QURAN_SCHEDULE, DISCUSSION_SCHEDULE, MORNING_QURAN_LIST, NIGHT_QURAN_LIST } from './constants';
-import { QURAN_PLAYLIST } from './quran_playlist';
+import { GOJOL_LIST, AZAN_URLS, QURAN_SCHEDULE, DISCUSSION_SCHEDULE } from './constants';
+import { QURAN_PLAYLIST, MORNING_QURAN_PLAYLIST } from './quran_playlist';
 import { calculatePrayerTimes, isItTimeForAzan } from './services/prayerService';
 import { getTime, getNormalizedCurrentTime, normalizeTimeInput, getEnglishDate, getBengaliDate } from './services/dateService';
 import { getDailyHadith, Hadith } from './services/hadithService';
@@ -120,8 +120,11 @@ const App: React.FC = () => {
 
     const quran = QURAN_SCHEDULE.find(q => normalizeTimeInput(q.time) === normalizedNow);
     if (quran) {
-      const list = normalizeTimeInput(quran.time).includes('AM') ? MORNING_QURAN_LIST : NIGHT_QURAN_LIST;
+      // সকাল ০৬:০০টার জন্য স্পেশাল লিস্ট, বাকি সময়ের জন্য জেনারেল লিস্ট
+      const isMorning = normalizeTimeInput(quran.time) === '6:00 AM';
+      const list = isMorning ? MORNING_QURAN_PLAYLIST : QURAN_PLAYLIST;
       const selected = list[dailySeed % list.length];
+      
       return { 
         type: PlayerState.SCHEDULED_PROGRAM, 
         name: null, 
@@ -335,9 +338,13 @@ const App: React.FC = () => {
                 <div className="space-y-2">
                   {QURAN_SCHEDULE.map((q, idx) => {
                     const isActive = normalizeTimeInput(q.time) === getNormalizedCurrentTime();
+                    // শিডিউল দেখানোর সময় সঠিক লিস্ট থেকে টাইটেল নেওয়া হচ্ছে
+                    const isMorning = normalizeTimeInput(q.time) === '6:00 AM';
+                    const list = isMorning ? MORNING_QURAN_PLAYLIST : QURAN_PLAYLIST;
+                    const qTitle = list[dailySeed % list.length].title;
                     return (
                       <div key={idx} className={`p-3 rounded-xl border transition-all ${isActive ? 'bg-emerald-500/20 border-emerald-400 shadow-inner scale-[0.98]' : 'bg-black/20 border-white/5'}`}>
-                        <p className="text-[11px] text-white/90 font-bold mb-1">{normalizeTimeInput(q.time).includes('AM') ? MORNING_QURAN_LIST[dailySeed % MORNING_QURAN_LIST.length].title : NIGHT_QURAN_LIST[dailySeed % NIGHT_QURAN_LIST.length].title}</p>
+                        <p className="text-[11px] text-white/90 font-bold mb-1">{qTitle}</p>
                         <p className={`text-[10px] font-black ${isActive ? 'text-yellow-400 animate-pulse' : 'text-emerald-400'}`}>{q.time}</p>
                       </div>
                     );
