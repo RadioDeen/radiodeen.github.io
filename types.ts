@@ -28,6 +28,7 @@ export interface ScheduledProgram {
   time: string; // Format: "HH:MM AM/PM" (e.g., "06:00 AM")
   url: string;
   title: string;
+  programTitle?: string; // তিলাওয়াত বা আলোচনার বিশেষ টাইটেল (যেমন: "দিনের বরকতময় শুরু")
   date?: string; // Format: "YYYY-MM-DD" (optional, for specific dates)
 }
 
