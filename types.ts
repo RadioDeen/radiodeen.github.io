@@ -24,12 +24,17 @@ export enum PlayerState {
   SCHEDULED_PROGRAM = 'SCHEDULED_PROGRAM'
 }
 
+export enum PlayMode {
+  GOJOL = 'GOJOL',
+  QURAN = 'QURAN'
+}
+
 export interface ScheduledProgram {
-  time: string; // Format: "HH:MM AM/PM" (e.g., "06:00 AM")
+  time: string;
   url: string;
   title: string;
-  programTitle?: string; // তিলাওয়াত বা আলোচনার বিশেষ টাইটেল (যেমন: "দিনের বরকতময় শুরু")
-  date?: string; // Format: "YYYY-MM-DD" (optional, for specific dates)
+  programTitle?: string;
+  date?: string;
 }
 
 export interface AppState {

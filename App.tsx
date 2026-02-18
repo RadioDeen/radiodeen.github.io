@@ -1,20 +1,22 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Gojol, PlayerState, PrayerTimes, ScheduledProgram } from './types';
+import { Gojol, PlayerState, PrayerTimes, ScheduledProgram, PlayMode } from './types';
 import { GOJOL_LIST, AZAN_URLS, QURAN_SCHEDULE, DISCUSSION_SCHEDULE, MORNING_QURAN_LIST, NIGHT_QURAN_LIST } from './constants';
+import { QURAN_PLAYLIST } from './quran_playlist';
 import { calculatePrayerTimes, isItTimeForAzan } from './services/prayerService';
 import { getTime, getNormalizedCurrentTime, normalizeTimeInput, getEnglishDate, getBengaliDate } from './services/dateService';
 import { getDailyHadith, Hadith } from './services/hadithService';
 import { Visualizer } from './components/Visualizer';
 import { Logo } from './components/Logo';
-import { Play, Pause, SkipForward, Radio, Clock, Volume2, ShieldCheck, Hourglass, Calendar, BookOpen, MapPin, AudioLines, List, X } from 'lucide-react';
+import { Play, Pause, SkipForward, Radio, Clock, Volume2, ShieldCheck, Hourglass, Calendar, BookOpen, MapPin, AudioLines, List, X, Music, BookText } from 'lucide-react';
 
 const PRAYER_LABELS: Record<string, string> = {
   fajr: 'ফজর', sunrise: 'সূর্যোদয়', dhuhr: 'যোহর', asr: 'আসর', maghrib: 'মাগরিব', isha: 'এশা'
 };
 
 const App: React.FC = () => {
-  const [currentGojol, setCurrentGojol] = useState<Gojol>(() => GOJOL_LIST[Math.floor(Math.random() * GOJOL_LIST.length)]);
+  const [activeMode, setActiveMode] = useState<PlayMode>(PlayMode.GOJOL);
+  const [currentGojol, setCurrentGojol] = useState<any>(() => GOJOL_LIST[Math.floor(Math.random() * GOJOL_LIST.length)]);
   const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.PAUSED);
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
   const [currentPrayer, setCurrentPrayer] = useState<string | null>(null);
@@ -165,19 +167,30 @@ const App: React.FC = () => {
     return () => clearInterval(interval);
   }, [getActivePriority, hasInteracted, isTransitioning]);
 
-  const performShuffle = useCallback(() => {
-    const nextGojol = GOJOL_LIST[Math.floor(Math.random() * GOJOL_LIST.length)];
-    setCurrentGojol(nextGojol);
+  const performShuffle = useCallback((modeOverride?: PlayMode) => {
+    const targetMode = modeOverride || activeMode;
+    const list = targetMode === PlayMode.GOJOL ? GOJOL_LIST : QURAN_PLAYLIST;
+    const nextItem = list[Math.floor(Math.random() * list.length)];
+    
+    setCurrentGojol(nextItem);
     setCurrentSchedule(null);
     setCurrentPrayer(null);
     setPlayerState(PlayerState.PLAYING);
     setIsTransitioning(false);
-  }, []);
+  }, [activeMode]);
 
   const handleShuffle = useCallback(() => {
     if (transitionTimeoutRef.current) clearTimeout(transitionTimeoutRef.current);
     performShuffle();
   }, [performShuffle]);
+
+  const toggleMode = (newMode: PlayMode) => {
+    if (newMode === activeMode) return;
+    if (!hasInteracted) setHasInteracted(true);
+    setActiveMode(newMode);
+    setIsTransitioning(true);
+    setTimeout(() => performShuffle(newMode), 1000);
+  };
 
   const handleTogglePlay = useCallback(() => {
     if (!hasInteracted) setHasInteracted(true);
@@ -208,9 +221,9 @@ const App: React.FC = () => {
         src={currentSrc}
         onEnded={() => {
           setIsTransitioning(true);
-          setTimeout(performShuffle, 1500);
+          setTimeout(() => performShuffle(), 1500);
         }}
-        onError={() => setTimeout(handleShuffle, 2000)}
+        onError={() => setTimeout(() => handleShuffle(), 2000)}
         muted={isMuted}
         playsInline
       />
@@ -258,13 +271,22 @@ const App: React.FC = () => {
           </button>
           <button onClick={handleShuffle} className="p-3.5 rounded-full bg-white/5 border border-white/5"><SkipForward className="w-5 h-5 text-white" /></button>
         </div>
-        <div className="w-full grid grid-cols-2 gap-3 text-[9px] font-black text-emerald-100 uppercase tracking-widest">
-          <div className="flex items-center justify-center gap-2 bg-black/30 py-3.5 rounded-xl border border-white/5 shadow-inner">
-            <Clock className="w-3.5 h-3.5 text-emerald-400" /><span>লাইভ ২৪/৭</span>
-          </div>
-          <div className="flex items-center justify-center gap-2 bg-black/30 py-3.5 rounded-xl border border-white/5 shadow-inner">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /><span>সুরক্ষিত</span>
-          </div>
+        
+        <div className="w-full grid grid-cols-2 gap-3">
+          <button 
+            onClick={() => toggleMode(PlayMode.GOJOL)}
+            className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl border transition-all ${activeMode === PlayMode.GOJOL ? 'bg-emerald-500 border-emerald-400 shadow-lg scale-105' : 'bg-black/30 border-white/5 opacity-60'}`}
+          >
+            <Music className={`w-4 h-4 ${activeMode === PlayMode.GOJOL ? 'text-white' : 'text-emerald-400'}`} />
+            <span className="text-[10px] font-black text-white uppercase tracking-widest">ইসলামী সংগীত</span>
+          </button>
+          <button 
+            onClick={() => toggleMode(PlayMode.QURAN)}
+            className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl border transition-all ${activeMode === PlayMode.QURAN ? 'bg-emerald-500 border-emerald-400 shadow-lg scale-105' : 'bg-black/30 border-white/5 opacity-60'}`}
+          >
+            <BookText className={`w-4 h-4 ${activeMode === PlayMode.QURAN ? 'text-white' : 'text-emerald-400'}`} />
+            <span className="text-[10px] font-black text-white uppercase tracking-widest">কুরআন তিলাওয়াত</span>
+          </button>
         </div>
       </div>
 
