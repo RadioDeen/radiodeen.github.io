@@ -351,6 +351,41 @@ export const GOJOL_LIST: Gojol[] = [
     artist: ' ',
     url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771406191/Ga-zar_Jonno_Hridoy_Kade_grzjap.mp3',
     thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '51',
+    title: 'সেই সংগ্রামী মানুষের সারিতে',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771417250/Sei_songrami_manusher_sarite_ymqwiz.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '52',
+    title: 'বেরিয়েছে যে কাফেলা',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771417252/Beriyeche_Je_Kafela_bdisdf.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '53',
+    title: 'ওগো মা',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771417258/Ogo_Maa_gfx33e.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '54',
+    title: 'আল্লাহ’র ভয়',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771417260/Allah_r_VOY_oilspl.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '55',
+    title: 'সিজদাতে হই নত',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771417262/Sijdate_Hoi_Noto_i2ou5z.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
   }
 ];
 
