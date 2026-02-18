@@ -52,7 +52,7 @@ export const getBengaliDate = () => {
 };
 
 /**
- * রিটার্ন করে "10:45 AM" ফরম্যাটে (ইন্টারনাল ম্যাচিং এর জন্য)
+ * রিটার্ন করে "2:41 PM" ফরম্যাটে (ইন্টারনাল ম্যাচিং এর জন্য)
  */
 export const getNormalizedCurrentTime = () => {
   const now = new Date();
@@ -77,13 +77,26 @@ export const getTime = () => {
 };
 
 /**
- * যে কোনো সময় স্ট্রিংকে (বাংলা বা ইংরেজি) "10:45 AM" ফরম্যাটে নিয়ে যায়
+ * যে কোনো সময় স্ট্রিংকে (বাংলা বা ইংরেজি) "2:41 PM" ফরম্যাটে নিয়ে যায়
+ * এটি ঘন্টার শুরুর শূন্য (যেমন ০২:৪১) বাদ দেয় যাতে সিস্টেম টাইমের সাথে মিলে।
  */
 export const normalizeTimeInput = (timeStr: string) => {
-  let normalized = toEnDigit(timeStr)
+  let englishStr = toEnDigit(timeStr)
     .replace('এএম', 'AM')
     .replace('পিএম', 'PM')
     .replace(/\s+/g, ' ')
     .trim();
-  return normalized;
+  
+  const parts = englishStr.split(' ');
+  if (parts.length < 2) return englishStr;
+  
+  const timeParts = parts[0].split(':');
+  if (timeParts.length < 2) return englishStr;
+  
+  // ঘন্টা থেকে শুরুর শূন্য বাদ দেওয়া (e.g. "02" -> "2")
+  const h = parseInt(timeParts[0], 10).toString();
+  const m = timeParts[1];
+  const ampm = parts[1];
+  
+  return `${h}:${m} ${ampm}`;
 };
