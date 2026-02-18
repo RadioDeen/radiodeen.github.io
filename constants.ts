@@ -312,27 +312,6 @@ export const GOJOL_LIST: Gojol[] = [
   }
 ];
 
-// সকালের কুরআন তিলাওয়াত সংগ্রহ
-export const MORNING_QURAN_LIST = [
-  { url: "https://res.cloudinary.com/dc8vv80pc/video/upload/v1771312400/Surah_Fatiha_Taqrim_rlpyte.mp3", title: "সুরা ফাতিহা" }
-];
-
-// রাতের কুরআন তিলাওয়াত সংগ্রহ
-export const NIGHT_QURAN_LIST = [
-  { url: "https://res.cloudinary.com/dc8vv80pc/video/upload/v1771312323/Surah_Maryam_Sherif_Mostafa_o64dht.mp3", title: "সুরা মারইয়াম" },
-  { url: "https://res.cloudinary.com/dc8vv80pc/video/upload/v1771312279/Surah_Mulk_Abdul_Rahman_Mossad_bnyjlb.mp3", title: "সুরা মুলক" },
-  { url: "https://res.cloudinary.com/dc8vv80pc/video/upload/v1771312272/Surah_Muhammad_Zikrullah_TV_xs9enb.mp3", title: "সুরা মুহাম্মাদ" },
-  { url: "https://res.cloudinary.com/dc8vv80pc/video/upload/v1771312268/Surah_Sajdah_Abdul_Rahman_Mossad_pxemlv.mp3", title: "সুরা সাজদাহ" },
-  { url: "https://res.cloudinary.com/dc8vv80pc/video/upload/v1771312254/Surah_Yunus_Abdul_Rahman_Mossad_z67t1f.mp3", title: "সুরা ইউনুছ" },
-  { url: "https://res.cloudinary.com/dc8vv80pc/video/upload/v1771312248/Abdul_Rahman_Mossad_rnwdam.mp3", title: "আব্দুল রাহমান মোসাদ" },
-  { url: "https://res.cloudinary.com/dc8vv80pc/video/upload/v1771312200/Surah_Ar-Rahman_asbmrn.mp3", title: "সুরা আর-রাহমান" },
-  { url: "https://res.cloudinary.com/dc8vv80pc/video/upload/v1771312187/Surah_Maryam_Abdul_Rahman_Mossad_fazmhi.mp3", title: "সুরা মারইয়াম" },
-  { url: "https://res.cloudinary.com/dc8vv80pc/video/upload/v1771312160/Surah_Ankabut_Abdul_Rahman_Mossad_hps7yq.mp3", title: "সুরা আনকাবূত" },
-  { url: "https://res.cloudinary.com/dc8vv80pc/video/upload/v1771312118/Surah_An-Naba_Abdul_Rahman_Mossad_yexhpe.mp3", title: "সুরা আন-নাবা" },
-  { url: "https://res.cloudinary.com/dc8vv80pc/video/upload/v1771312111/Surah_Al-Muzzammil_Zikrullah_TV_jnoffq.mp3", title: "সুরা আল-মুযযাম্মিল" },
-  { url: "https://res.cloudinary.com/dc8vv80pc/video/upload/v1771312332/Surah_Yaseen_Zikrullah_TV_zukhvo.mp3", title: "সুরা ইয়া-সীন" }
-];
-
 // ৫ ওয়াক্তের আজান লিংক
 export const AZAN_URLS: Record<string, string> = {
   'ফজর': 'https://rawcdn.githack.com/RadioDeen/radiodeen.github.io/06aa1baffbb71d75c3048d75506bb59c6440f386/Azan/Fajr_Azan.mp3',
@@ -348,12 +327,12 @@ export const AZAN_URLS: Record<string, string> = {
  */
 export const QURAN_SCHEDULE: ScheduledProgram[] = [
   {
-    time: "০৬:০০ এএম", // সকালের সময় পরিবর্তন করুন এখানে
+    time: "০৬:০০ এএম", 
     url: "", 
     title: "দিনের বরকতময় শুরু"
   },
   {
-    time: "১০:০০ পিএম", // রাতের সময় পরিবর্তন করুন এখানে
+    time: "০২:৪৬ পিএম", 
     url: "", 
     title: "রাতের প্রশান্তি"
   }
