@@ -8,7 +8,7 @@ import { getTime, getNormalizedCurrentTime, normalizeTimeInput, getEnglishDate, 
 import { getDailyHadith, Hadith } from './services/hadithService';
 import { Visualizer } from './components/Visualizer';
 import { Logo } from './components/Logo';
-import { Play, Pause, SkipForward, Radio, Clock, Volume2, ShieldCheck, Hourglass, Calendar, BookOpen, MapPin, AudioLines, List, X, Music, BookText } from 'lucide-react';
+import { Play, Pause, SkipForward, Radio, Clock, Volume2, ShieldCheck, Hourglass, Calendar, BookOpen, MapPin, AudioLines, List, X, Music, BookText, Info, Mail, MessageCircle, Download } from 'lucide-react';
 
 const PRAYER_LABELS: Record<string, string> = {
   fajr: 'ফজর', sunrise: 'সূর্যোদয়', dhuhr: 'যোহর', asr: 'আসর', maghrib: 'মাগরিব', isha: 'এশা'
@@ -305,7 +305,7 @@ const App: React.FC = () => {
           {prayerTimes && Object.entries(prayerTimes).map(([key, time]) => {
             const isCurrent = currentPrayer?.toLowerCase() === PRAYER_LABELS[key]?.toLowerCase();
             return (
-              <div key={key} className={`glass-panel p-3.5 md:p-5 rounded-2xl text-center transition-all duration-300 border-emerald-500/10 ${isCurrent ? 'bg-emerald-500/70 scale-105 shadow-lg border-emerald-200' : ''}`}>
+              <div key={key} className={`glass-panel p-3.5 md:p-5 rounded-2xl text-center transition-all duration-300 border-emerald-500/10 ${isCurrent ? 'bg-emerald-500/70 shadow-lg border-emerald-200' : ''}`}>
                 <p className="text-[9px] uppercase opacity-70 mb-1.5 font-black tracking-widest text-emerald-50">{PRAYER_LABELS[key] || key}</p>
                 <p className={`text-sm md:text-base font-bold ${isCurrent ? 'text-yellow-300' : 'text-white'}`}>{time}</p>
               </div>
@@ -333,36 +333,42 @@ const App: React.FC = () => {
           <div className="absolute bottom-20 right-0 w-[280px] md:w-[350px] glass-panel rounded-3xl p-6 shadow-2xl border-emerald-500/30 animate-in fade-in slide-in-from-bottom-5 overflow-hidden">
             <div className="max-h-[60vh] overflow-y-auto pr-1 scroll-smooth">
               <div className="mb-6">
-                <div className="flex items-center gap-2 mb-4 text-emerald-400 font-black text-sm uppercase tracking-wider"><AudioLines className="w-4 h-4" /><span>কুরআন তেলাওয়াত শিডিউল</span></div>
-                <div className="space-y-2">
-                  {QURAN_SCHEDULE.map((q, idx) => {
-                    const isActive = normalizeTimeInput(q.time) === getNormalizedCurrentTime();
-                    const isMorning = normalizeTimeInput(q.time) === '6:00 AM';
-                    const list = isMorning ? MORNING_QURAN_PLAYLIST : QURAN_PLAYLIST;
-                    const qTitle = list[dailySeed % list.length].title;
-                    return (
-                      <div key={idx} className={`p-3 rounded-xl border transition-all ${isActive ? 'bg-emerald-500/20 border-emerald-400 shadow-inner scale-[0.98]' : 'bg-black/20 border-white/5'}`}>
-                        <p className="text-[11px] text-white/90 font-bold mb-1">{qTitle}</p>
-                        <p className={`text-[10px] font-black ${isActive ? 'text-yellow-400 animate-pulse' : 'text-emerald-400'}`}>{q.time}</p>
-                      </div>
-                    );
-                  })}
+                <div className="flex items-center gap-2 mb-3 text-emerald-400 font-black text-sm uppercase tracking-wider">
+                  <Info className="w-4 h-4" /><span>রেডিও দীন সম্পর্কে</span>
+                </div>
+                <div className="bg-black/20 p-4 rounded-xl border border-white/5">
+                  <p className="text-xs text-white/80 leading-relaxed text-justify font-medium">
+                    রেডিও দীন একটি ২৪/৭ ইসলামী রেডিও প্ল্যাটফর্ম। সুস্থ ও সুন্দর সুরের সাথে আপনার প্রতিদিনের আধ্যাত্মিক সঙ্গী হতে আমাদের এই ক্ষুদ্র প্রচেষ্টা। এখানে আপনি পাবেন কুরআন তিলাওয়াত, ইসলামী সংগীত এবং জীবন ঘনিষ্ঠ বিশেষ আলোচনা।
+                  </p>
                 </div>
               </div>
-              <div>
-                <div className="flex items-center gap-2 mb-4 text-yellow-400 font-black text-sm uppercase tracking-wider"><Calendar className="w-4 h-4" /><span>আসন্ন বিশেষ আলোচনা</span></div>
+
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3 text-yellow-400 font-black text-sm uppercase tracking-wider">
+                  <Mail className="w-4 h-4" /><span>যোগাযোগ</span>
+                </div>
                 <div className="space-y-2">
-                  {DISCUSSION_SCHEDULE.map((d, idx) => (
-                    <div key={idx} className="p-3 rounded-xl bg-black/20 border border-white/5">
-                      <p className="text-[11px] text-white/90 font-bold mb-1">{d.title}</p>
-                      <div className="flex justify-between text-[10px] font-black text-yellow-500"><span>{d.date}</span><span>{d.time}</span></div>
-                    </div>
-                  ))}
+                  <a href="mailto:radiodeen24@gmail.com" className="flex items-center gap-3 p-3 rounded-xl bg-black/20 border border-white/5 hover:bg-emerald-500/10 transition-colors">
+                    <Mail className="w-4 h-4 text-emerald-400" />
+                    <span className="text-[11px] text-white/90 font-bold">radiodeen24@gmail.com</span>
+                  </a>
+                  <a href="https://wa.me/8801881786281" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-black/20 border border-white/5 hover:bg-emerald-500/10 transition-colors">
+                    <MessageCircle className="w-4 h-4 text-emerald-400" />
+                    <span className="text-[11px] text-white/90 font-bold">+৮৮০১৮৮১৭৮৬২৮১</span>
+                  </a>
                 </div>
               </div>
+
+              <a 
+                href="https://rawcdn.githack.com/RadioDeen/radiodeen.github.io/3a470feffd1c95f9ac614164dc32c7be8cddad1b/Android%20App/Radio%20Deen.apk" 
+                className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg transition-all active:scale-95 group"
+              >
+                <Download className="w-5 h-5 group-hover:animate-bounce" />
+                <span className="text-sm font-black uppercase tracking-widest">ডাউনলোড এ্যাপ</span>
+              </a>
             </div>
             <div className="mt-4 pt-4 border-t border-white/5 text-center">
-              <p className="text-[9px] text-white/20 font-bold tracking-widest uppercase">রেডিও দীন শিডিউল</p>
+              <p className="text-[9px] text-white/20 font-bold tracking-widest uppercase">রেডিও দীন - আপনার প্রতিদিনের সঙ্গী</p>
             </div>
           </div>
         )}
