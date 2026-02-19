@@ -456,6 +456,153 @@ export const GOJOL_LIST: Gojol[] = [
     artist: ' ',
     url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771476645/Bariwala_naire_duniyate__cut_360sec_hvjh16.mp3',
     thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '66',
+    title: 'জুলাই জাগরণ',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771477444/July_Jagoron_txirhn.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '67',
+    title: 'কিছু রাত আছে ভোর হয় না',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771477458/Kichu_Rat_Ache_r6m8l0.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '68',
+    title: 'মন আমার দেহঘড়ি',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771477471/Mon_Amar_Deho_Ghori_b1ct3u.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '69',
+    title: 'Humne Akhon Se',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771477473/Humne_Akhon_Se_uvzzh8.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '70',
+    title: 'Meri Ulfat Madine Se',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771477486/Meri_Ulfat_Madine_Se_vkedeb.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '71',
+    title: 'ও আমার পরাণ পাখি',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771477493/O_Amar_poran_pakhi_dlghgb.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '72',
+    title: 'মুহাম্মাদের নাম জপেছিলি',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771477502/Muhammader_Naam_Jopechile_frogzu.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '73',
+    title: 'হঠাৎ আজরাইল পাঠাইয়া',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771477503/Hothat_ajrail_pathaiya__cut_254sec_qokptl.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '74',
+    title: 'কেউ ভালোবাসে না',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771477511/Keu_Valobashe_na__cut_300sec_uok9o2.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '75',
+    title: 'নীল ঝর্ণার গান',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771477515/NIL_JHORNAR_GAAN__cut_239sec_un2uxm.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '76',
+    title: 'রোজা রাখো রোজা',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771478124/Roja_Rakho_Roja_zjnwvk.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '77',
+    title: 'রাতের আলোয় সিজদার ছায়া',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771478127/Rater_aloy_sijdar_chayay_mgxdm9.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '78',
+    title: 'সে কোন বন্ধু বলো',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771478132/Se_Kon_Bondhu_Bolo_xcxdki.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '79',
+    title: 'সাজদাহ',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771478132/SAJDAH_exjwon.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '80',
+    title: 'রাসূলের মতো চাঁদ',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771478137/Rasuler_Moto_Chad_iycqkz.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '81',
+    title: 'প্রহরী অতন্দ্র',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771478144/Prohori_Otondro_gjmdjy.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '82',
+    title: 'সূর তার মৌ মৌ',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771478153/Sur_Tar_Mou_Mou_zsoes5.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '83',
+    title: 'সংগ্রামী মানুষের সারিতে',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771478156/Shongrami_Manuhser_Sharite_z0oxum.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '84',
+    title: 'তাক্বওয়া',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771478175/Taqwa__cut_196sec_vsbbuc.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '85',
+    title: 'Tearful',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771478185/Tearful_Emotional_hyqsav.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '86',
+    title: 'তোমার নামে যদি গান গাওয়া হয়',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771478186/Tomar_Name_Jodi_Gaan_Gawa_Hoy__cut_241sec_w5osch.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
   }
 ];
 
