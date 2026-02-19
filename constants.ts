@@ -386,6 +386,76 @@ export const GOJOL_LIST: Gojol[] = [
     artist: ' ',
     url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771417262/Sijdate_Hoi_Noto_i2ou5z.mp3',
     thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '56',
+    title: 'আসসুুবুহু বাদা মিন',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771476581/Assubhu_Bada_hwmpl2.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '57',
+    title: 'আয় নাবিয়্যি মুহতারাম',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771476588/Ay_Nabiye_Muhtaram_r1dqbu.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '58',
+    title: 'আবরার ফাহাদের মতো',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771476599/Abrar_Fahader_Moto_Desh_Premi_td39hc.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '59',
+    title: 'ফ্যাসিবাদের ফাঁসি চাই',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771476601/Fascibader_Fashi_Chai_nizfk8.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '60',
+    title: 'আল্লাহ প্রেমের কুরবানী',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771476607/Allah_Premer_Qurbani_nq02m4.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '61',
+    title: 'একদিন মাটির ভিতরে হবে ঘর',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771476627/Ekdin_Matir_Vitore_Hobe_Ghor_zr0cfz.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '62',
+    title: 'দ্রোহের ফিলিস্তিন',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771476634/Droher_Filistin_kr5snr.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '63',
+    title: 'Darpaish Ho Taiba Ka Safar',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771476636/Darpaish_Ho_Taiba_Ka_Safar__cut_227sec_qdoozp.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '64',
+    title: 'এই মিছে দুনিয়ায়',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771476641/Ei_Miche_duniya__cut_195sec_w2qbys.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '65',
+    title: 'বাড়িওয়ালা নাইরে দুনিয়াতে',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771476645/Bariwala_naire_duniyate__cut_360sec_hvjh16.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
   }
 ];
 
