@@ -233,13 +233,13 @@ const App: React.FC = () => {
       <header className="w-full max-w-5xl flex flex-col sm:flex-row justify-between items-center sm:items-end gap-4 mb-6 py-3 border-b border-emerald-500/10">
         <div className="text-center sm:text-left flex flex-col gap-1">
           <div className="flex items-center justify-center sm:justify-start gap-3">
-            <Radio className="text-emerald-400 w-8 h-8 md:w-12 lg:w-14 drop-shadow-md" />
+            <Radio className="text-emerald-400 w-8 h-8 md:w-12 lg:w-14 drop-shadow-md" aria-hidden="true" />
             <h1 className="text-2xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-emerald-400 via-emerald-300 to-yellow-200 bg-clip-text text-transparent py-1 leading-tight">রেডিও দীন</h1>
           </div>
           <p className="text-emerald-100 text-[10px] md:text-xs lg:text-sm opacity-80 font-bold tracking-[0.1em]">সুস্থ ও সুন্দর সুরের সাথে সারাক্ষণ...</p>
         </div>
         <div className="flex flex-col items-center sm:items-end">
-          <div className="text-2xl md:text-4xl lg:text-5xl font-bold text-yellow-300 mb-1 drop-shadow-lg">{currentTimeDisplay}</div>
+          <time className="text-2xl md:text-4xl lg:text-5xl font-bold text-yellow-300 mb-1 drop-shadow-lg">{currentTimeDisplay}</time>
           <div className="flex flex-col items-center sm:items-end gap-0.5 text-[9px] md:text-xs text-emerald-50 font-bold">
             <div className="flex items-center gap-1"><Calendar className="w-3 h-3 text-emerald-400" /><span>{getBengaliDate()} (বাংলা)</span></div>
             <div className="opacity-50">{getEnglishDate()} (ইংরেজি)</div>
@@ -247,13 +247,16 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <div className="w-full max-w-[280px] md:max-w-[360px] glass-panel rounded-[2rem] p-7 md:p-9 shadow-2xl flex flex-col items-center relative overflow-hidden mb-10 border border-white/5">
+      <main className="w-full max-w-[280px] md:max-w-[360px] glass-panel rounded-[2rem] p-7 md:p-9 shadow-2xl flex flex-col items-center relative overflow-hidden mb-10 border border-white/5">
         {isTransitioning && (
           <div className="absolute inset-0 bg-emerald-950/95 backdrop-blur-md z-20 flex flex-col items-center justify-center text-center p-4">
             <Hourglass className="w-8 h-8 text-yellow-400 animate-spin" />
+            <p className="mt-2 text-xs font-bold text-white">পরিবর্তন হচ্ছে...</p>
           </div>
         )}
-        <div className="w-32 h-32 md:w-40 md:h-40 mb-5"><Logo isPlaying={playerState !== PlayerState.PAUSED && !isTransitioning} /></div>
+        <div className="w-32 h-32 md:w-40 md:h-40 mb-5" aria-hidden="true">
+          <Logo isPlaying={playerState !== PlayerState.PAUSED && !isTransitioning} />
+        </div>
         <div className="text-center mb-5 w-full min-h-[3.5rem] flex flex-col justify-center">
           <h2 className="text-[13px] md:text-sm font-normal italic text-white leading-tight line-clamp-2 px-1">
             {(playerState === PlayerState.AZAN || currentPrayer) ? `${currentPrayer || 'পবিত্র'} আজান` : (currentSchedule?.title || currentGojol.title)}
@@ -267,16 +270,17 @@ const App: React.FC = () => {
         </div>
         <div className="w-full mb-6 px-3"><Visualizer isPlaying={playerState !== PlayerState.PAUSED && !isTransitioning} /></div>
         <div className="flex items-center gap-6 mb-7">
-          <button onClick={() => setIsMuted(!isMuted)} className="p-3.5 rounded-full bg-white/5 border border-white/5"><Volume2 className={`w-5 h-5 ${isMuted ? 'text-red-500' : 'text-white'}`} /></button>
-          <button onClick={handleTogglePlay} disabled={isTransitioning} className="w-14 h-14 md:w-18 md:h-18 rounded-full flex items-center justify-center bg-emerald-500 hover:bg-emerald-400 shadow-xl transition-all active:scale-95">
+          <button onClick={() => setIsMuted(!isMuted)} aria-label={isMuted ? "শব্দ চালু করুন" : "শব্দ বন্ধ করুন"} className="p-3.5 rounded-full bg-white/5 border border-white/5 transition-transform active:scale-90"><Volume2 className={`w-5 h-5 ${isMuted ? 'text-red-500' : 'text-white'}`} /></button>
+          <button onClick={handleTogglePlay} disabled={isTransitioning} aria-label={playerState !== PlayerState.PAUSED ? "থামান" : "চালান"} className="w-14 h-14 md:w-18 md:h-18 rounded-full flex items-center justify-center bg-emerald-500 hover:bg-emerald-400 shadow-xl transition-all active:scale-95">
             {playerState !== PlayerState.PAUSED && !isTransitioning ? <Pause className="w-7 h-7 text-white" /> : <Play className="text-white translate-x-0.5 w-7 h-7" />}
           </button>
-          <button onClick={handleShuffle} className="p-3.5 rounded-full bg-white/5 border border-white/5"><SkipForward className="w-5 h-5 text-white" /></button>
+          <button onClick={handleShuffle} aria-label="পরবর্তী" className="p-3.5 rounded-full bg-white/5 border border-white/5 transition-transform active:scale-90"><SkipForward className="w-5 h-5 text-white" /></button>
         </div>
         
-        <div className="w-full grid grid-cols-2 gap-3">
+        <nav className="w-full grid grid-cols-2 gap-3" aria-label="প্লেলিস্ট নেভিগেশন">
           <button 
             onClick={() => toggleMode(PlayMode.GOJOL)}
+            aria-pressed={activeMode === PlayMode.GOJOL}
             className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl border transition-all ${activeMode === PlayMode.GOJOL ? 'bg-emerald-500 border-emerald-400 shadow-lg' : 'bg-black/30 border-white/5 opacity-60'}`}
           >
             <Music className={`w-4 h-4 ${activeMode === PlayMode.GOJOL ? 'text-white' : 'text-emerald-400'}`} />
@@ -284,49 +288,55 @@ const App: React.FC = () => {
           </button>
           <button 
             onClick={() => toggleMode(PlayMode.QURAN)}
+            aria-pressed={activeMode === PlayMode.QURAN}
             className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl border transition-all ${activeMode === PlayMode.QURAN ? 'bg-emerald-500 border-emerald-400 shadow-lg' : 'bg-black/30 border-white/5 opacity-60'}`}
           >
             <BookText className={`w-4 h-4 ${activeMode === PlayMode.QURAN ? 'text-white' : 'text-emerald-400'}`} />
             <span className="text-[10px] font-black text-white uppercase tracking-widest">কুরআন তিলাওয়াত</span>
           </button>
-        </div>
-      </div>
+        </nav>
+      </main>
 
-      <div className="w-full max-w-5xl px-3 mb-10 text-center">
+      <section className="w-full max-w-5xl px-3 mb-10 text-center" aria-label="নামাজের সময়সূচী">
         <h3 className="text-sm md:text-lg font-black mb-2 flex items-center justify-center gap-3 text-emerald-400">
           <MapPin className="w-5 h-5" />আজকের নামাজের ওয়াক্ত ({locationName})
         </h3>
         {!isLocationEnabled && (
           <p className="text-yellow-400 text-[10px] font-bold animate-pulse mb-5 tracking-wide">
-            ডিভাইসের লোকেশন চালু করুন
+            সঠিক সময়ের জন্য ডিভাইসের লোকেশন চালু করুন
           </p>
         )}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-3">
           {prayerTimes && Object.entries(prayerTimes).map(([key, time]) => {
             const isCurrent = currentPrayer?.toLowerCase() === PRAYER_LABELS[key]?.toLowerCase();
             return (
-              <div key={key} className={`glass-panel p-3.5 md:p-5 rounded-2xl text-center transition-all duration-300 border-emerald-500/10 ${isCurrent ? 'bg-emerald-500/70 shadow-lg border-emerald-200' : ''}`}>
+              <div key={key} className={`glass-panel p-3.5 md:p-5 rounded-2xl text-center transition-all duration-300 border-emerald-500/10 ${isCurrent ? 'bg-emerald-500/70 shadow-lg border-emerald-200 ring-2 ring-emerald-300/50' : ''}`}>
                 <p className="text-[9px] uppercase opacity-70 mb-1.5 font-black tracking-widest text-emerald-50">{PRAYER_LABELS[key] || key}</p>
                 <p className={`text-sm md:text-base font-bold ${isCurrent ? 'text-yellow-300' : 'text-white'}`}>{time}</p>
               </div>
             );
           })}
         </div>
-      </div>
+      </section>
 
       {dailyHadith && (
-        <div className="w-full max-w-3xl px-4 mb-20">
+        <article className="w-full max-w-3xl px-4 mb-20" aria-label="আজকের হাদীস">
           <div className="glass-panel rounded-[1.5rem] p-6 md:p-9 border-yellow-500/20 relative group overflow-hidden shadow-lg transition-all hover:border-emerald-500/30">
             <div className="absolute -top-3 -right-3 opacity-5 rotate-12 transition-transform group-hover:scale-110"><BookOpen className="w-16 h-16 text-white" /></div>
             <div className="flex items-center gap-2 text-yellow-400 mb-4 font-black text-[10px] uppercase tracking-[0.2em]"><div className="w-8 h-[2px] bg-yellow-400"></div>আজকের হাদীস</div>
             <p className="text-white text-sm md:text-xl font-bold leading-relaxed mb-4 text-justify">" {dailyHadith.text} "</p>
             <p className="text-emerald-300 font-black text-xs text-right opacity-80">— {dailyHadith.reference}</p>
           </div>
-        </div>
+        </article>
       )}
 
-      <div className="fixed bottom-6 right-6 z-50">
-        <button onClick={() => setIsScheduleOpen(!isScheduleOpen)} className={`w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(16,185,129,0.3)] transition-all transform active:scale-95 ${isScheduleOpen ? 'bg-red-500 rotate-90' : 'bg-emerald-500 hover:scale-110'}`}>
+      <aside className="fixed bottom-6 right-6 z-50">
+        <button 
+          onClick={() => setIsScheduleOpen(!isScheduleOpen)} 
+          aria-expanded={isScheduleOpen}
+          aria-label="মেনু খুলুন"
+          className={`w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(16,185,129,0.3)] transition-all transform active:scale-95 ${isScheduleOpen ? 'bg-red-500 rotate-90' : 'bg-emerald-500 hover:scale-110'}`}
+        >
           {isScheduleOpen ? <X className="w-6 h-6 text-white" /> : <List className="w-6 h-6 text-white" />}
         </button>
         {isScheduleOpen && (
@@ -362,6 +372,7 @@ const App: React.FC = () => {
               <a 
                 href="https://rawcdn.githack.com/RadioDeen/radiodeen.github.io/3a470feffd1c95f9ac614164dc32c7be8cddad1b/Android%20App/Radio%20Deen.apk" 
                 className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg transition-all active:scale-95 group"
+                download
               >
                 <Download className="w-5 h-5 group-hover:animate-bounce" />
                 <span className="text-sm font-black uppercase tracking-widest">ডাউনলোড এ্যাপ</span>
@@ -372,8 +383,11 @@ const App: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
-      <footer className="mt-auto mb-8 text-center text-white/20 text-[11px] font-bold tracking-wide">রেডিও দীন - আপনার প্রতিদিনের আধ্যাত্মিক সঙ্গী</footer>
+      </aside>
+      
+      <footer className="mt-auto mb-8 text-center text-white/20 text-[11px] font-bold tracking-wide">
+        &copy; {new Date().getFullYear()} রেডিও দীন - আপনার প্রতিদিনের আধ্যাত্মিক সঙ্গী। সর্বস্বত্ব সংরক্ষিত।
+      </footer>
     </div>
   );
 };
