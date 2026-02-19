@@ -603,6 +603,139 @@ export const GOJOL_LIST: Gojol[] = [
     artist: ' ',
     url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771478186/Tomar_Name_Jodi_Gaan_Gawa_Hoy__cut_241sec_w5osch.mp3',
     thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '87',
+    title: 'মারহাবা',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771488894/Marhaba_qnu0jc.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '88',
+    title: 'আজ নয়তো কাল',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771488900/Aj_noyto_kal_vki2bc.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '89',
+    title: 'আলহামদুলিল্লাহ',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771488911/Alhamdulillah_ea5csl.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '90',
+    title: 'আমি ফিরবো না মাদীনা থেকে',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771488922/Ami_Firbo_Na_Madina_Theke_sdboon.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '91',
+    title: 'আমি পথ হারিয়ে',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771488928/Ami_Poth_Hariye_fczdb8.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '92',
+    title: 'নীলের কাছে',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771488931/Niler_Kache_sqcvn4.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '93',
+    title: 'করো হে কবুল',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771488953/Koro_He_Kabul_vafeqd.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '94',
+    title: 'আল্লাহ আল্লাহ',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771488953/Allah_Allah_j3ncur.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '95',
+    title: 'ফিদায়ে মুহাম্মাদ',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771488958/Fidaye_Muhammad_dotfdi.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '96',
+    title: 'আল্লাহু আল্লাহ',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771488955/Allahu_Allah_scxhfg.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '97',
+    title: 'Arabic Mashup',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771488970/Arabic_Mashup_tm6ymq.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '98',
+    title: 'কাছে ডাকো যত তুমি',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771488974/Kache_Dako_Joto_Tumi_wzc8sc.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '99',
+    title: 'আলো',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771488977/Alo_scvhk4.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '100',
+    title: 'কুন আনতা',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771488994/KUN_ANTA_ldmxt8.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '101',
+    title: 'ঐক্যের গান',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771489679/Oikker_Gan_kbnd4b.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '102',
+    title: 'Tamanna Muddaton Se Hai',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771489679/Tamanna_Muddaton_Se_Hai_ovgwhh.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '103',
+    title: 'Ruher Qaseeda',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771489671/Ruher_Qaseeda_by3myw.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '104',
+    title: 'তুমি চাঁদের আলোর চেয়ে',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771489670/Tumi_Chader_Alor_Chye_x9qsx3.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
+  },
+  {
+    id: '105',
+    title: 'রঙ্গিন এই পৃথিবী',
+    artist: ' ',
+    url: 'https://res.cloudinary.com/dc8vv80pc/video/upload/v1771489664/Rongin_ei_prithibi_kyhoin.mp3',
+    thumbnail: 'https://picsum.photos/seed/islam5/400/400'
   }
 ];
 
